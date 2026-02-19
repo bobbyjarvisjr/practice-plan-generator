@@ -7,176 +7,144 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Load curriculum data
 const curriculumData = JSON.parse(
   fs.readFileSync(path.join(__dirname, 'curriculum_data.json'), 'utf-8')
 );
 
-// Initialize Anthropic client
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Helper function to get songs by belt level (e.g. "Foundation" matches "Foundation 1", "Foundation 2", "Foundation 3")
 function getSongsByBelt(belt) {
-  return curriculumData.filter(song => song.difficulty_level.startsWith(belt));
+  return curriculumData.filter(function(song) {
+    return song.difficulty_level.startsWith(belt);
+  });
 }
 
-// Build curriculum context for Claude
 function buildCurriculumContext() {
-  const belts = ['Foundation', 'Developing', 'Competent', 'Advanced', 'Master'];
+  var belts = ['Foundation', 'Developing', 'Competent', 'Advanced', 'Master'];
+  var context = '# CURRICULUM DATABASE\n\n';
+  context += 'You have access to ' + curriculumData.length + ' songs organized by difficulty level.\n';
+  context += 'Difficulty uses a belt system: Foundation (easiest) to Developing to Competent to Advanced to Master (hardest).\n';
+  context += 'Each belt has sub-levels 1-3 (1=easier end, 3=harder end of that belt).\n\n';
 
-  let context = `# CURRICULUM DATABASE\n\n`;
-  context += `You have access to ${curriculumData.length} songs organized by difficulty level.\n`;
-  context += `Difficulty uses a belt system: Foundation (easiest) → Developing → Competent → Advanced → Master (hardest).\n`;
-  context += `Each belt has sub-levels 1-3 (1=easier end, 3=harder end of that belt).\n\n`;
-
-  for (const belt of belts) {
-    const songs = getSongsByBelt(belt);
-    context += `## ${belt} Level (${songs.length} songs)\n`;
-    songs.forEach(song => {
-      let songLine = `- **${song.title}** by ${song.artist} [${song.difficulty_level}]`;
-      if (song.skill_category) songLine += ` | Skill: ${song.skill_category}`;
-      if (song.secondary_skill_category) songLine += ` + ${song.secondary_skill_category}`;
-      if (song.existing_masterclass) songLine += ` | [COURSE: ${song.existing_masterclass}]`;
-      if (song.potential_masterclass) songLine += ` | [SUPPORTS: ${song.potential_masterclass}]`;
+  for (var i = 0; i < belts.length; i++) {
+    var belt = belts[i];
+    var songs = getSongsByBelt(belt);
+    context += '## ' + belt + ' Level (' + songs.length + ' songs)\n';
+    songs.forEach(function(song) {
+      var songLine = '- **' + song.title + '** by ' + song.artist + ' [' + song.difficulty_level + ']';
+      if (song.skill_category) songLine += ' | Skill: ' + song.skill_category;
+      if (song.secondary_skill_category) songLine += ' + ' + song.secondary_skill_category;
+      if (song.existing_masterclass) songLine += ' | [COURSE: ' + song.existing_masterclass + ']';
+      if (song.potential_masterclass) songLine += ' | [SUPPORTS: ' + song.potential_masterclass + ']';
       context += songLine + '\n';
     });
     context += '\n';
   }
-
   return context;
 }
 
-// Main API endpoint
-app.post('/api/generate-plan', async (req, res) => {
+app.post('/api/generate-plan', async function(req, res) {
   try {
-    const { scales, triads, chords, arpeggios, navigation, technique, struggles } = req.body;
-
-    // Build assessment summary
-    const assessment = {
-      scales: scales || {},
-      triads: triads || {},
-      chords: chords || {},
-      arpeggios: arpeggios || {},
-      navigation: navigation || {},
-      technique: technique || {},
-      struggles: struggles || []
+    var body = req.body;
+    var assessment = {
+      scales: body.scales || {},
+      triads: body.triads || {},
+      chords: body.chords || {},
+      arpeggios: body.arpeggios || {},
+      navigation: body.navigation || {},
+      technique: body.technique || {},
+      struggles: body.struggles || []
     };
 
-    // Calculate weakest areas
-    const allScores = {
-      ...assessment.scales,
-      ...assessment.triads,
-      ...assessment.chords,
-      ...assessment.arpeggios,
-      ...assessment.navigation,
-      ...assessment.technique
-    };
+    var allScores = Object.assign({},
+      assessment.scales,
+      assessment.triads,
+      assessment.chords,
+      assessment.arpeggios,
+      assessment.navigation,
+      assessment.technique
+    );
 
-    const avgScore = Object.values(allScores).reduce((a, b) => a + b, 0) / Object.keys(allScores).length || 0;
-    const weakAreas = Object.entries(allScores)
-      .filter(([key, val]) => val <= 2)
-      .map(([key]) => key);
+    var scoreValues = Object.values(allScores);
+    var avgScore = scoreValues.length > 0
+      ? scoreValues.reduce(function(a, b) { return a + b; }, 0) / scoreValues.length
+      : 0;
 
-    // Build the system prompt
-    const systemPrompt = `You are an experienced guitar teacher creating a personalized practice plan for a student.
+    var weakAreas = Object.entries(allScores)
+      .filter(function(entry) { return entry[1] <= 2; })
+      .map(function(entry) { return entry[0]; });
 
-Your response has two parts:
+    var systemPrompt = 'You are an experienced guitar teacher creating a personalized practice plan for a student.\n\n' +
+      'Your response has two parts:\n\n' +
+      'PART 1 - ASSESSMENT (3-4 paragraphs):\n' +
+      '- Give an honest overview of where they are at based on their scores\n' +
+      '- Identify their 2-3 most important areas to develop\n' +
+      '- Explain WHY these areas matter for their playing\n' +
+      '- Be direct and specific, not generic\n\n' +
+      'PART 2 - SONG RECOMMENDATIONS (exactly 5-7 songs):\n' +
+      '- Pick songs that directly address their weak areas\n' +
+      '- Match difficulty to their level using the difficulty_level field (e.g. "Competent 2") - do not jump too far ahead\n' +
+      '- For each song: one clear sentence on why it helps, difficulty level, and any relevant masterclass\n' +
+      '- Order from most accessible to most challenging\n' +
+      '- Where a song has a secondary_skill_category, mention it briefly\n\n' +
+      'Rules:\n' +
+      '- Recommend EXACTLY 5-7 songs. Not more.\n' +
+      '- If a song has [COURSE: X] - say "covered in X"\n' +
+      '- If a song has [SUPPORTS: X] - say "X masterclass would complement this"\n' +
+      '- Tone: direct, encouraging, British guitar teacher. No corporate speak. No waffle.\n' +
+      '- Be concise. Every sentence should earn its place.';
 
-PART 1 - ASSESSMENT (3-4 paragraphs):
-- Give an honest overview of where they're at based on their scores
-- Identify their 2-3 most important areas to develop
-- Explain WHY these areas matter for their playing
-- Be direct and specific, not generic
+    var curriculumContext = buildCurriculumContext();
 
-PART 2 - SONG RECOMMENDATIONS (exactly 5-7 songs):
-- Pick songs that directly address their weak areas
-- Match difficulty to their level using the difficulty_level field (e.g. "Competent 2") - don't jump too far ahead
-- For each song: one clear sentence on why it helps, plus mention the masterclass if one exists
-- Order from most accessible to most challenging
-- Where a song has a secondary_skill_category, mention it briefly
+    var assessmentSummary = '\nASSESSMENT RESULTS:\n' +
+      '- Average technical level: ' + (avgScore / 5 * 100).toFixed(0) + '%\n' +
+      '- Main weak areas: ' + (weakAreas.length > 0 ? weakAreas.slice(0, 5).join(', ') : 'Overall development needed') + '\n' +
+      '- Self-reported struggles: ' + (assessment.struggles.length > 0 ? assessment.struggles.join(', ') : 'None specified') + '\n\n' +
+      'Detailed scores:\n' +
+      JSON.stringify(assessment, null, 2) + '\n\n' +
+      curriculumContext + '\n\n' +
+      'TASK:\n' +
+      '1. Write a detailed assessment of this player (3-4 paragraphs) covering their current level, what is holding them back, and what to prioritise\n' +
+      '2. Recommend exactly 5-7 songs from the curriculum that will move the needle on their weakest areas\n' +
+      '3. For each song: one clear reason why it helps, difficulty level, and any relevant masterclass\n\n' +
+      'Format as clean HTML for embedding in a web page. Use <h2>, <h3>, <p>, <ul>, <li> tags. Wrap each song in <div class="song-recommendation"> tags. Keep it tight - no padding, no repetition.';
 
-Rules:
-- Recommend EXACTLY 5-7 songs. Not more.
-- If a song has [COURSE: X] - say "covered in X"
-- If a song has [SUPPORTS: X] - say "X masterclass would complement this"
-- Tone: direct, encouraging, British guitar teacher. No corporate speak. No waffle.
-- Be concise. Every sentence should earn its place.`;
-
-    // Build the user prompt
-    const curriculumContext = buildCurriculumContext();
-    
-    const assessmentSummary = `
-ASSESSMENT RESULTS:
-- Average technical level: ${(avgScore / 5 * 100).toFixed(0)}%
-- Main weak areas: ${weakAreas.length > 0 ? weakAreas.slice(0, 5).join(', ') : 'Overall development needed'}
-- Self-reported struggles: ${assessment.struggles.length > 0 ? assessment.struggles.join(', ') : 'None specified'}
-
-Detailed scores:
-${JSON.stringify(assessment, null, 2)}
-
-${curriculumContext}
-
-TASK: 
-1. Write a detailed assessment of this player (3-4 paragraphs) covering their current level, what's holding them back, and what to prioritise
-2. Recommend exactly 5-7 songs from the curriculum that will move the needle on their weakest areas
-3. For each song: one clear reason why it helps, difficulty level, and any relevant masterclass
-
-Format as clean HTML for embedding in a web page. Use <h2>, <h3>, <p>, <ul>, <li> tags. Wrap each song in <div class="song-recommendation"> tags. Keep it tight - no padding, no repetition.
-
-    // Call Claude API
-    const message = await anthropic.messages.create({
+    var message = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 2500,
       system: systemPrompt,
-      messages: [
-        {
-          role: 'user',
-          content: assessmentSummary
-        }
-      ]
+      messages: [{ role: 'user', content: assessmentSummary }]
     });
 
-    // Extract and clean the response
-    let planText = message.content[0].type === 'text' ? message.content[0].text : '';
-    
-    // Clean up any markdown code fence artifacts
-    planText = planText.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
-    planText = planText.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
-    planText = planText.replace(/^["']html["']\n?/i, '').trim();
+    var planText = message.content[0].type === 'text' ? message.content[0].text : '';
 
-    // Return as JSON
-    res.json({
-      plan: planText
-    });
+    // Strip markdown code fences if present
+    planText = planText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
+
+    res.json({ plan: planText });
 
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).json({
-      error: error.message || 'Failed to generate practice plan'
-    });
+    res.status(500).json({ error: error.message || 'Failed to generate practice plan' });
   }
 });
 
-// Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', function(req, res) {
   res.json({ status: 'ok' });
 });
 
-// Serve index.html for root path
-app.get('/', (req, res) => {
+app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`✓ Server running on http://localhost:${PORT}`);
-  console.log(`✓ Curriculum loaded: ${curriculumData.length} songs`);
-  console.log(`✓ API endpoint: POST /api/generate-plan`);
-  console.log(`✓ Model: Claude Sonnet 4.5`);
+app.listen(PORT, function() {
+  console.log('Server running on port ' + PORT);
+  console.log('Curriculum loaded: ' + curriculumData.length + ' songs');
+  console.log('API endpoint: POST /api/generate-plan');
 });
