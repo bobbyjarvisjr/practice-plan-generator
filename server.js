@@ -145,7 +145,7 @@ Start with a brief assessment, then lay out the recommendations.`;
 
     // Call Claude API
     const message = await anthropic.messages.create({
-      model: 'claude-opus-4-5-20251101',
+      model: 'claude-sonnet-4-5-20250929',
       max_tokens: 2000,
       system: systemPrompt,
       messages: [
