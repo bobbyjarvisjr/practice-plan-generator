@@ -2,9 +2,9 @@
   {
     "title": "In Bloom",
     "artist": "Nirvana",
-    "primary_skill": "Root Notes / Beginner Fundamentals",
-    "secondary_skills": "Doing flats",
-    "difficulty_level": "Foundation",
+    "skill_category": "Beginner Fundamentals",
+    "secondary_skill_category": null,
+    "difficulty_level": "Foundation 2",
     "existing_masterclass": null,
     "potential_masterclass": "Breaking Out of Box 1",
     "teaching_notes": "Great for beginners working on root notes"
@@ -12,9 +12,9 @@
   {
     "title": "Wish You Were Here",
     "artist": "Pink Floyd",
-    "primary_skill": "Beginner Major Pentatonic",
-    "secondary_skills": "Simple intro solo",
-    "difficulty_level": "Foundation",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Foundation 3",
     "existing_masterclass": null,
     "potential_masterclass": "Major Pentatonic 101",
     "teaching_notes": "Beginner intro solo to major pentatonic and simple part to learn"
@@ -22,9 +22,9 @@
   {
     "title": "I Love Rock and Roll",
     "artist": "Joan Jett",
-    "primary_skill": "Simple Riff",
-    "secondary_skills": "Beginner work",
-    "difficulty_level": "Foundation",
+    "skill_category": "Beginner Fundamentals",
+    "secondary_skill_category": null,
+    "difficulty_level": "Foundation 1",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Good simple riff there for beginners"
@@ -32,9 +32,9 @@
   {
     "title": "Redemption Song",
     "artist": "Bob Marley",
-    "primary_skill": "Beginner Acoustic",
-    "secondary_skills": null,
-    "difficulty_level": "Foundation",
+    "skill_category": "Beginner Fundamentals",
+    "secondary_skill_category": null,
+    "difficulty_level": "Foundation 1",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Nice little easy beginner one"
@@ -42,9 +42,9 @@
   {
     "title": "Smoke on the Water",
     "artist": "Deep Purple",
-    "primary_skill": "Beginner Riff",
-    "secondary_skills": null,
-    "difficulty_level": "Foundation",
+    "skill_category": "Beginner Fundamentals",
+    "secondary_skill_category": null,
+    "difficulty_level": "Foundation 1",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Comfortably none - black and black"
@@ -52,9 +52,9 @@
   {
     "title": "Wonderful Tonight",
     "artist": "Eric Clapton",
-    "primary_skill": "Beginner Piece",
-    "secondary_skills": null,
-    "difficulty_level": "Foundation",
+    "skill_category": "Beginner Fundamentals",
+    "secondary_skill_category": null,
+    "difficulty_level": "Foundation 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Piece of pest beginner kind of thing"
@@ -62,9 +62,9 @@
   {
     "title": "Hey Joe",
     "artist": "Jimi Hendrix",
-    "primary_skill": "Beginner Chords",
-    "secondary_skills": "Chromatic bass line",
-    "difficulty_level": "Foundation",
+    "skill_category": "Beginner Fundamentals",
+    "secondary_skill_category": null,
+    "difficulty_level": "Foundation 2",
     "existing_masterclass": null,
     "potential_masterclass": "CAGED?",
     "teaching_notes": "Good beginner chord thing - does the whole chromatic bass line thing doesn't it"
@@ -72,19 +72,19 @@
   {
     "title": "Faith",
     "artist": "George Michael",
-    "primary_skill": "16th Note Funk",
-    "secondary_skills": "Groove work",
-    "difficulty_level": "Developing",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhythm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Great 16th note funk groove"
   },
   {
     "title": "Johnny B. Goode",
     "artist": "Chuck Berry",
-    "primary_skill": "Major Pentatonic",
-    "secondary_skills": "Rock and roll",
-    "difficulty_level": "Developing",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 3",
     "existing_masterclass": null,
     "potential_masterclass": "Major Pentatonic 101",
     "teaching_notes": "Major pentatonic"
@@ -92,9 +92,9 @@
   {
     "title": "Hold Back the River",
     "artist": "James Bay",
-    "primary_skill": "Open 10ths",
-    "secondary_skills": "Root and 3rd up octave",
-    "difficulty_level": "Developing",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Open 10ths - root and 3rd up an octave"
@@ -102,9 +102,9 @@
   {
     "title": "Scar Tissue",
     "artist": "Red Hot Chili Peppers",
-    "primary_skill": "Open 10ths",
-    "secondary_skills": "Root and 3rd up octave",
-    "difficulty_level": "Developing",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Same as Hold Back the River and Blackbird"
@@ -112,9 +112,9 @@
   {
     "title": "Blackbird",
     "artist": "The Beatles",
-    "primary_skill": "Open 10ths",
-    "secondary_skills": "Fingerpicking",
-    "difficulty_level": "Developing",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 3",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Open 10ths and fingerpicking - root and third up an octave"
@@ -122,9 +122,9 @@
   {
     "title": "Here There and Everywhere",
     "artist": "The Beatles",
-    "primary_skill": "Diatonic Progression",
-    "secondary_skills": "1-2-3-4 progression",
-    "difficulty_level": "Developing",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 1",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Diatonic 1-2-3-4 chord progression"
@@ -132,9 +132,9 @@
   {
     "title": "Lake of Fire",
     "artist": "Nirvana",
-    "primary_skill": "Beginner Solo",
-    "secondary_skills": null,
-    "difficulty_level": "Developing",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": "Breaking Out of Box 1",
     "teaching_notes": "That's later fire Nirvana - got a nice little beginner solo in it"
@@ -142,9 +142,9 @@
   {
     "title": "Highway to Hell",
     "artist": "AC/DC",
-    "primary_skill": "Rhythm",
-    "secondary_skills": null,
-    "difficulty_level": "Developing",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Rhythm again"
@@ -152,9 +152,9 @@
   {
     "title": "More Than Words",
     "artist": "Extreme",
-    "primary_skill": "Fingerpicking",
-    "secondary_skills": null,
-    "difficulty_level": "Developing",
+    "skill_category": "Fingerpicking",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 1",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "You know that's kind of obvious - that kind of fingerpicking starting to fingerpicking"
@@ -162,9 +162,9 @@
   {
     "title": "Sunshine of Your Love",
     "artist": "Cream",
-    "primary_skill": "Blues Scale",
-    "secondary_skills": "Classic riff",
-    "difficulty_level": "Developing",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 1",
     "existing_masterclass": null,
     "potential_masterclass": "Breaking Out of Box 1",
     "teaching_notes": "Just you know the old blue scale"
@@ -172,9 +172,9 @@
   {
     "title": "Sweet Child O' Mine",
     "artist": "Guns N' Roses",
-    "primary_skill": "Cross Picking",
-    "secondary_skills": "Intro work",
-    "difficulty_level": "Developing",
+    "skill_category": "Arpeggios",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 3",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Intro for cross picking - pretty obvious"
@@ -182,9 +182,9 @@
   {
     "title": "Crazy Train",
     "artist": "Ozzy Osbourne",
-    "primary_skill": "Alternate Picking",
-    "secondary_skills": "Power chords to flat 6",
-    "difficulty_level": "Developing",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": "Triads",
     "teaching_notes": "Classic alternate picking - just all that classic power chord going to the flat 6 kind of thing"
@@ -192,9 +192,9 @@
   {
     "title": "Lucky",
     "artist": "Radiohead",
-    "primary_skill": "Open Chord Work",
-    "secondary_skills": "B minor work",
-    "difficulty_level": "Developing",
+    "skill_category": "Beginner Fundamentals",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": "How Music Works",
     "teaching_notes": "Really like that one because it targets the one of the first songs that just uses B minors and all open chords"
@@ -202,9 +202,9 @@
   {
     "title": "Climb Up the Walls",
     "artist": "Radiohead",
-    "primary_skill": "Open Chord Work",
-    "secondary_skills": "Similar to Lucky",
-    "difficulty_level": "Developing",
+    "skill_category": "Beginner Fundamentals",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": "How Music Works",
     "teaching_notes": "Similar is climb up the walls actually"
@@ -212,9 +212,9 @@
   {
     "title": "Brown Eyed Girl",
     "artist": "Van Morrison",
-    "primary_skill": "Thirds",
-    "secondary_skills": "Classic work",
-    "difficulty_level": "Developing",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": "How Music Works",
     "teaching_notes": "Classic isn't it - the thirds"
@@ -222,9 +222,9 @@
   {
     "title": "Living on a Prayer",
     "artist": "Bon Jovi",
-    "primary_skill": "Beginner Work",
-    "secondary_skills": null,
-    "difficulty_level": "Developing",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Developing 2",
     "existing_masterclass": null,
     "potential_masterclass": "How Music Works",
     "teaching_notes": "I guess I teach that sometimes"
@@ -232,9 +232,9 @@
   {
     "title": "Perfect",
     "artist": "Fairground Attraction",
-    "primary_skill": "Major Pentatonic Solo",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": "Following the Changes",
+    "difficulty_level": "Competent 2",
     "existing_masterclass": "Pentatonic Phrasing Course",
     "potential_masterclass": null,
     "teaching_notes": "Great major pentatonic solo"
@@ -242,9 +242,9 @@
   {
     "title": "Let It Be",
     "artist": "The Beatles",
-    "primary_skill": "Major Pentatonic Solo",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": "Pentatonic Phrasing Course",
     "potential_masterclass": null,
     "teaching_notes": "Major pentatonic solo - could almost be competent"
@@ -252,9 +252,9 @@
   {
     "title": "Dust in the Wind",
     "artist": "Kansas",
-    "primary_skill": "Fingerpicking",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Fingerpicking",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Great for fingerpicking"
@@ -262,9 +262,9 @@
   {
     "title": "Jack and Diane",
     "artist": "John Mellencamp",
-    "primary_skill": "Closed Voice Triads",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Triads",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": "Triads",
     "potential_masterclass": null,
     "teaching_notes": "Closed voice triads"
@@ -272,9 +272,9 @@
   {
     "title": "Don't Speak",
     "artist": "No Doubt",
-    "primary_skill": "Closed Voice Triads",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Triads",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": "Triads",
     "potential_masterclass": null,
     "teaching_notes": "Closed voice triads"
@@ -282,9 +282,9 @@
   {
     "title": "Black Magic Woman",
     "artist": "Santana",
-    "primary_skill": "Minor Pentatonic Add 9",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Pentatonic Add 9",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": "Minor Pentatonic Add 9",
     "potential_masterclass": null,
     "teaching_notes": "Minor pentatonic add 9 - just that very first line"
@@ -292,9 +292,9 @@
   {
     "title": "Get Back",
     "artist": "The Beatles",
-    "primary_skill": "Major Pentatonic",
-    "secondary_skills": "Following changes",
-    "difficulty_level": "Competent",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": "Following the Changes",
+    "difficulty_level": "Competent 1",
     "existing_masterclass": null,
     "potential_masterclass": "Major Pentatonic 101",
     "teaching_notes": "Major pentatonic and kind of following the changes"
@@ -302,9 +302,9 @@
   {
     "title": "American Boy",
     "artist": "Estelle & Kanye",
-    "primary_skill": "Major 7 Chords",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Like to use for teaching major 7 chords sometimes"
@@ -312,9 +312,9 @@
   {
     "title": "Is There Anybody Out There",
     "artist": "Pink Floyd",
-    "primary_skill": "Arpeggiated Fingerstyle",
-    "secondary_skills": "Beginner fingerpicking",
-    "difficulty_level": "Competent",
+    "skill_category": "Fingerpicking",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Arpeggios",
     "teaching_notes": "Really good for arpeggiated fingerstyle"
@@ -322,9 +322,9 @@
   {
     "title": "Tears in Heaven",
     "artist": "Eric Clapton",
-    "primary_skill": "Beginner Fingerpicking",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Fingerpicking",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Nice beginner fingerpicking tune"
@@ -332,9 +332,9 @@
   {
     "title": "Scarborough Fair",
     "artist": "Simon & Garfunkel",
-    "primary_skill": "Fingerpicking",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Fingerpicking",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "For fingerpicking - really like to teach that as a fingerpicking tune"
@@ -342,9 +342,9 @@
   {
     "title": "Sweet Home Alabama",
     "artist": "Lynyrd Skynyrd",
-    "primary_skill": "Intro/Solo",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Breaking Out of Box 1",
     "teaching_notes": "Solo intro I guess - don't teach that very much anymore"
@@ -352,19 +352,19 @@
   {
     "title": "Don't Stop Believin'",
     "artist": "Journey",
-    "primary_skill": "1-5-6-4 Progression",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": null,
-    "potential_masterclass": "How music works",
+    "potential_masterclass": "How Music Works",
     "teaching_notes": "That ties in with Under the Bridge - same chords"
   },
   {
     "title": "Shine On You Crazy Diamond",
     "artist": "Pink Floyd",
-    "primary_skill": "Pentatonic + 9th / Gilmour Bending",
-    "secondary_skills": "Space, targeting the 9th",
-    "difficulty_level": "Competent",
+    "skill_category": "Pentatonic Add 9",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": "Minor Pentatonic Add 9",
     "potential_masterclass": null,
     "teaching_notes": "Lots of space and targeting the 9th"
@@ -372,9 +372,9 @@
   {
     "title": "Zephyr Song",
     "artist": "Red Hot Chili Peppers",
-    "primary_skill": "Shell Voicings",
-    "secondary_skills": "Triads",
-    "difficulty_level": "Competent",
+    "skill_category": "Triads",
+    "secondary_skill_category": "Arpeggios",
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Triads",
     "teaching_notes": "Shell voicings and triads"
@@ -382,9 +382,9 @@
   {
     "title": "Mercy Mercy Me",
     "artist": "Marvin Gaye",
-    "primary_skill": "Soul Chords",
-    "secondary_skills": "Slash chords (A/B to E)",
-    "difficulty_level": "Competent",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Soul chords and slash chord A/B resolving to E major"
@@ -392,19 +392,19 @@
   {
     "title": "I Shot the Sheriff",
     "artist": "Eric Clapton",
-    "primary_skill": "Polyrhythms",
-    "secondary_skills": "Minor chord progressions with minor V",
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhyhm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Good example of polyrhythms and minor V chord"
   },
   {
     "title": "Message in a Bottle",
     "artist": "The Police",
-    "primary_skill": "Add 9 Chords",
-    "secondary_skills": "Stacked 5ths",
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": "Minor Pentatonic Add 9",
     "potential_masterclass": null,
     "teaching_notes": "Add 9 chords and stacked 5ths"
@@ -412,9 +412,9 @@
   {
     "title": "Every Breath You Take",
     "artist": "The Police",
-    "primary_skill": "Add 9 Chords",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": "Minor Pentatonic Add 9",
     "potential_masterclass": null,
     "teaching_notes": "Add 9 chords"
@@ -422,9 +422,9 @@
   {
     "title": "Chan Chan",
     "artist": "Buena Vista Social Club",
-    "primary_skill": "Minor Solo",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Modes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Great minor solo"
@@ -432,9 +432,9 @@
   {
     "title": "What Is and What Should Never Be",
     "artist": "Led Zeppelin",
-    "primary_skill": "Different Feels and Grooves",
-    "secondary_skills": "Intermediate workout",
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Great for intermediate players - different feels and grooves with little solo"
@@ -442,9 +442,9 @@
   {
     "title": "Black Dog",
     "artist": "Led Zeppelin",
-    "primary_skill": "Blues Scale",
-    "secondary_skills": "Rhythmic displacement",
-    "difficulty_level": "Competent",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Breaking Out of Box 1",
     "teaching_notes": "Use of blues scale and rhythmic displacement"
@@ -452,9 +452,9 @@
   {
     "title": "Cleanup Woman",
     "artist": "Betty Wright",
-    "primary_skill": "Triads",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Triads",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Triads",
     "teaching_notes": "Great for triads"
@@ -462,9 +462,9 @@
   {
     "title": "Plug In Baby",
     "artist": "Muse",
-    "primary_skill": "Scales in Thirds",
-    "secondary_skills": "Scale patterns",
-    "difficulty_level": "Competent",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Major Scale 101",
     "teaching_notes": "Baby come back - actually Plug In Baby by Muse"
@@ -472,9 +472,9 @@
   {
     "title": "Since I've Been Loving You",
     "artist": "Led Zeppelin",
-    "primary_skill": "Minor Blues",
-    "secondary_skills": "Targeting minor 3rd on IV",
-    "difficulty_level": "Competent",
+    "skill_category": "Blues",
+    "secondary_skill_category": "Major Scale / Diatonic",
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Mixing Pentatonics",
     "teaching_notes": "Great example targeting minor 3rd on IV chord in minor blues"
@@ -482,9 +482,9 @@
   {
     "title": "Drag Racer",
     "artist": "Doug (unknown)",
-    "primary_skill": "Major Pentatonic",
-    "secondary_skills": "Workout",
-    "difficulty_level": "Competent",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
     "potential_masterclass": "Major Pentatonic 101",
     "teaching_notes": "Major pentatonic workout"
@@ -492,9 +492,9 @@
   {
     "title": "Let's Stay Together",
     "artist": "Al Green",
-    "primary_skill": "Soul Chords",
-    "secondary_skills": "Chord workout",
-    "difficulty_level": "Competent",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Great soul chord workout"
@@ -502,9 +502,9 @@
   {
     "title": "Need Your Love So Bad",
     "artist": "Fleetwood Mac",
-    "primary_skill": "Blues Ballad",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Blues",
+    "secondary_skill_category": "Major Pentatonic",
+    "difficulty_level": "Competent 2",
     "existing_masterclass": "Pentatonic Phrasing Course",
     "potential_masterclass": null,
     "teaching_notes": "Great blues ballad - developing/competent"
@@ -512,9 +512,9 @@
   {
     "title": "I'm Gonna Find Another You",
     "artist": "John Mayer",
-    "primary_skill": "Blues Ballad",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Blues",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Same as Need Your Love So Bad - competent"
@@ -522,9 +522,9 @@
   {
     "title": "Still Got the Blues",
     "artist": "Gary Moore",
-    "primary_skill": "Arpeggiated Chords",
-    "secondary_skills": "Accurate bends and simple lead line",
-    "difficulty_level": "Competent",
+    "skill_category": "Arpeggios",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Arpeggios",
     "teaching_notes": "Arpeggiated chords and accurate bends with simple lead line"
@@ -532,9 +532,9 @@
   {
     "title": "November Rain",
     "artist": "Guns N' Roses",
-    "primary_skill": "Diatonic Solo",
-    "secondary_skills": "Major scale",
-    "difficulty_level": "Competent",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": "Major Scale 101",
     "potential_masterclass": null,
     "teaching_notes": "Diatonic major scale solo - straight major if I remember rightly"
@@ -542,9 +542,9 @@
   {
     "title": "Easy",
     "artist": "Commodores",
-    "primary_skill": "Soul Solo",
-    "secondary_skills": "Mixing pentatonics",
-    "difficulty_level": "Competent",
+    "skill_category": "Mixing Pentatonics",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
     "potential_masterclass": "Mixing Pentatonics",
     "teaching_notes": "Great little solo - also uses a bit of mixing pentatonics"
@@ -552,9 +552,9 @@
   {
     "title": "Layla",
     "artist": "Eric Clapton",
-    "primary_skill": "Lead Line",
-    "secondary_skills": "Adding the 9th",
-    "difficulty_level": "Competent",
+    "skill_category": "Pentatonic Add 9",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Minor Pentatonic Add 9",
     "teaching_notes": "Good for little lead line there - adds the 9th in the lead"
@@ -562,9 +562,9 @@
   {
     "title": "Crazy Little Thing Called Love",
     "artist": "Queen",
-    "primary_skill": "Strumming",
-    "secondary_skills": "Modal interchange at end",
-    "difficulty_level": "Competent",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": "Following the Changes",
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Modes Continued",
     "teaching_notes": "General strumming for beginners - actually got a nice little bit of modal interchange right at the end"
@@ -572,9 +572,9 @@
   {
     "title": "Roxanne",
     "artist": "The Police",
-    "primary_skill": "Triads",
-    "secondary_skills": "Stab rhythms",
-    "difficulty_level": "Competent",
+    "skill_category": "Triads",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Triads",
     "teaching_notes": "Really good for triads - got stab rhythms"
@@ -582,9 +582,9 @@
   {
     "title": "Black Hole Sun",
     "artist": "Soundgarden",
-    "primary_skill": "Arpeggiated Chords",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Arpeggios",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": null,
     "potential_masterclass": "Arpeggios",
     "teaching_notes": "Arpeggiated chords - haven't taught for a while to be fair"
@@ -592,9 +592,9 @@
   {
     "title": "Fragile",
     "artist": "Sting",
-    "primary_skill": "Phrasing",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Great for phrasing"
@@ -602,9 +602,9 @@
   {
     "title": "Beast of Burden",
     "artist": "The Rolling Stones",
-    "primary_skill": "Rhythm",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Nice one for rhythm again"
@@ -612,9 +612,9 @@
   {
     "title": "Thrill is Gone",
     "artist": "B.B. King",
-    "primary_skill": "Minor Pentatonic Lead",
-    "secondary_skills": "Blues phrasing",
-    "difficulty_level": "Competent",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": "Blues",
+    "difficulty_level": "Competent 2",
     "existing_masterclass": "Pentatonic Phrasing Course",
     "potential_masterclass": null,
     "teaching_notes": "Great for minor pentatonic lead lines"
@@ -622,89 +622,89 @@
   {
     "title": "Spoonman",
     "artist": "Soundgarden",
-    "primary_skill": "Time Signatures",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhythm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Good for time signatures"
   },
   {
     "title": "Golden Brown",
     "artist": "The Stranglers",
-    "primary_skill": "Time Signatures",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
-    "existing_masterclass": "Rhythm workshop",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
+    "existing_masterclass": "Rhythm Workshop",
     "potential_masterclass": null,
     "teaching_notes": "Good for time signatures"
   },
   {
     "title": "Mission Impossible",
     "artist": "Theme",
-    "primary_skill": "Time Signatures",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhyhm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Good for time signatures"
   },
   {
     "title": "The Ocean",
     "artist": "Led Zeppelin",
-    "primary_skill": "Time Signatures",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
-    "existing_masterclass": "Rhythm workshop",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
+    "existing_masterclass": "Rhythm Workshop",
     "potential_masterclass": null,
     "teaching_notes": "Good for time signatures"
   },
   {
     "title": "Get Up (Sex Machine)",
     "artist": "James Brown",
-    "primary_skill": "Funk Grooves",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhyhm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Some funky tunes - funk grooves"
   },
   {
     "title": "Funky Miracle",
     "artist": "The Meters",
-    "primary_skill": "Funk Grooves",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhyhm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Funk groove"
   },
   {
     "title": "Hand Clapping Song",
     "artist": "The Meters",
-    "primary_skill": "Funk Grooves",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhyhm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Funk groove"
   },
   {
     "title": "Cissy Strut",
     "artist": "The Meters",
-    "primary_skill": "Funk Grooves",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhyhm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Funk groove - these all go together"
   },
   {
     "title": "Money",
     "artist": "Pink Floyd",
-    "primary_skill": "Solo Phrasing",
-    "secondary_skills": "A/B phrasing structure",
-    "difficulty_level": "Competent",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Great solo there - easier solo, that one"
@@ -712,9 +712,9 @@
   {
     "title": "You Oughta Know",
     "artist": "Alanis Morissette",
-    "primary_skill": "Rock Rhythm",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Not Lars Morissette - haven't taught for ages"
@@ -722,19 +722,19 @@
   {
     "title": "This Charming Man",
     "artist": "The Smiths",
-    "primary_skill": "Syncopated Rhythm",
-    "secondary_skills": "Funky rhythm guitar",
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhyhm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Great for syncopated rhythm guitar - funky rhythm guitar"
   },
   {
     "title": "Santeria",
     "artist": "Sublime",
-    "primary_skill": "Chords",
-    "secondary_skills": "Major solo",
-    "difficulty_level": "Competent",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": "Rhythm & Funk",
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Major Scale 101",
     "teaching_notes": "Good for chords - got a nice little solo in it actually - this is the major solo major solo for that"
@@ -742,9 +742,9 @@
   {
     "title": "The Pretender",
     "artist": "Foo Fighters",
-    "primary_skill": "Specific Triad",
-    "secondary_skills": "Secondary dominance",
-    "difficulty_level": "Competent",
+    "skill_category": "Arpeggios",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Triads",
     "teaching_notes": "Good one for showing that triad that everyone forgets and also for doing - don't teach that one that much to be fair"
@@ -752,19 +752,19 @@
   {
     "title": "Good Times",
     "artist": "Chic",
-    "primary_skill": "Funk Rhythm",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
-    "existing_masterclass": "Rhythm workshop",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
+    "existing_masterclass": "Rhythm Workshop",
     "potential_masterclass": null,
     "teaching_notes": "Love teaching those ones - funk rhythm"
   },
   {
     "title": "Le Freak",
     "artist": "Chic",
-    "primary_skill": "Funk Rhythm",
-    "secondary_skills": "Dorian mode",
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
     "potential_masterclass": "Modes Continued",
     "teaching_notes": "Good times for free - just to hate you be for the Dorian mode and also just the groove"
@@ -772,9 +772,9 @@
   {
     "title": "Under the Bridge",
     "artist": "Red Hot Chili Peppers",
-    "primary_skill": "1-5-6-4 Progression",
-    "secondary_skills": "Hendrix double stops",
-    "difficulty_level": "Competent",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "How Music Works",
     "teaching_notes": "Great example of 1-5-6-4 chord progression and doing Hendrix-y double stop stuff"
@@ -782,19 +782,19 @@
   {
     "title": "Here Come the Meatmen",
     "artist": "Unknown Artist",
-    "primary_skill": "Funk Groove",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
-    "potential_masterclass": "Rhyhm workshop",
+    "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Another nice little funky funk one"
   },
   {
     "title": "Nothing Else Matters",
     "artist": "Metallica",
-    "primary_skill": "Pentatonic + 9th",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Pentatonic Add 9",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Minor Pentatonic Add 9",
     "teaching_notes": "Solo - good for just pentatonic hitting the 9 again"
@@ -802,9 +802,9 @@
   {
     "title": "Walk This Way",
     "artist": "Aerosmith",
-    "primary_skill": "16th Note Syncopations",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
     "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "16th note syncopations"
@@ -812,9 +812,9 @@
   {
     "title": "Wanted Dead or Alive",
     "artist": "Bon Jovi",
-    "primary_skill": "Sliding 6ths",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Like that one - demonstrating sliding 6 - that's a good one actually"
@@ -822,9 +822,9 @@
   {
     "title": "Street Spirit",
     "artist": "Radiohead",
-    "primary_skill": "Arpeggio Exercise",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Arpeggios",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": null,
     "potential_masterclass": "Arpeggios",
     "teaching_notes": "Really like Street Spirit for teaching cool like an arpeggio chord exercise"
@@ -832,9 +832,9 @@
   {
     "title": "Can't Stop",
     "artist": "Red Hot Chili Peppers",
-    "primary_skill": "Muted Funk Strumming",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Really good for that kind of muted funk strumming kind of thing"
@@ -842,9 +842,9 @@
   {
     "title": "Purple Rain",
     "artist": "Prince",
-    "primary_skill": "Major Scale Solo",
-    "secondary_skills": "Add 9 chords",
-    "difficulty_level": "Competent",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": "Major Scale 101",
     "potential_masterclass": null,
     "teaching_notes": "For major scale kind of solo - natural diatonic solo and those lovely add 9 chords"
@@ -852,9 +852,9 @@
   {
     "title": "Snow",
     "artist": "Red Hot Chili Peppers",
-    "primary_skill": "Arpeggiated Chords",
-    "secondary_skills": "C shape & G shape CAGED",
-    "difficulty_level": "Competent",
+    "skill_category": "Arpeggios",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
     "potential_masterclass": "CAGED Deep Dive / Arpeggios",
     "teaching_notes": "Great for arpeggiated chords and doing C shape and G shape - really good"
@@ -862,9 +862,9 @@
   {
     "title": "Funk 49",
     "artist": "James Gang",
-    "primary_skill": "Blues Groove",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 3",
     "existing_masterclass": null,
     "potential_masterclass": "Mixing Pentatonics",
     "teaching_notes": "Love teaching that - great example of just doing a kind of standard blues groove"
@@ -872,9 +872,9 @@
   {
     "title": "Creep",
     "artist": "Radiohead",
-    "primary_skill": "Major 3rd Chords",
-    "secondary_skills": "Arpeggiated",
-    "difficulty_level": "Competent",
+    "skill_category": "Arpeggios",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 1",
     "existing_masterclass": null,
     "potential_masterclass": "Arpeggios",
     "teaching_notes": "Great example of the major 3 chords and arpeggiated chords"
@@ -882,9 +882,9 @@
   {
     "title": "Last Dance With Mary Jane",
     "artist": "Tom Petty",
-    "primary_skill": "Diatonic / Dorian",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Modes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": "Modes Continued",
     "teaching_notes": "Don't really teach that Dorian no I think"
@@ -892,9 +892,9 @@
   {
     "title": "I Just Want to Celebrate",
     "artist": "Rare Earth",
-    "primary_skill": "Funk Grooves",
-    "secondary_skills": null,
-    "difficulty_level": "Competent",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Competent 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Just wanna try and give stuff that I actually like to do though and actually use rather than just really obvious generic shit"
@@ -902,9 +902,9 @@
   {
     "title": "You Might Need Somebody",
     "artist": "Randy Crawford",
-    "primary_skill": "Phrasing / Story Arc",
-    "secondary_skills": "Solo construction",
-    "difficulty_level": "Advanced",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Great solo for building a story arc and phrasing"
@@ -912,9 +912,9 @@
   {
     "title": "Set Up for Nothing",
     "artist": "Rage Against the Machine",
-    "primary_skill": "Major Scale / Diatonic Solo",
-    "secondary_skills": "Legato",
-    "difficulty_level": "Advanced",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "Major Scale 101",
     "teaching_notes": "Use of major scales with lots of legato"
@@ -922,9 +922,9 @@
   {
     "title": "Brothers in Arms",
     "artist": "Dire Straits",
-    "primary_skill": "Pentatonic + 9th",
-    "secondary_skills": "Intro work",
-    "difficulty_level": "Advanced",
+    "skill_category": "Pentatonic Add 9",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": "Minor Pentatonic Add 9",
     "potential_masterclass": null,
     "teaching_notes": "Intro uses 9th with pentatonic"
@@ -932,9 +932,9 @@
   {
     "title": "Wind Cries Mary",
     "artist": "Jimi Hendrix",
-    "primary_skill": "Major Pentatonic",
-    "secondary_skills": "Double stops & CAGED",
-    "difficulty_level": "Advanced",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": "Following the Changes",
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": "Song Study: Wind Cries Mary",
     "potential_masterclass": null,
     "teaching_notes": "Major pentatonic solo with double stops and CAGED"
@@ -942,9 +942,9 @@
   {
     "title": "Cosmic Girl",
     "artist": "Jamiroquai",
-    "primary_skill": "16th Note Funk",
-    "secondary_skills": "Groove work",
-    "difficulty_level": "Advanced",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Great 16th note funk groove"
@@ -952,9 +952,9 @@
   {
     "title": "Time",
     "artist": "Pink Floyd",
-    "primary_skill": "Solo Work",
-    "secondary_skills": "Phrasing",
-    "difficulty_level": "Advanced",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Great solo to learn there - competent/advanced"
@@ -962,9 +962,9 @@
   {
     "title": "Just the Two of Us",
     "artist": "Bill Withers",
-    "primary_skill": "7th Chords",
-    "secondary_skills": "Chord progressions",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": "Extended Chords",
     "potential_masterclass": null,
     "teaching_notes": "One of favorite songs for teaching 7th chords"
@@ -972,9 +972,9 @@
   {
     "title": "Rock With You",
     "artist": "Michael Jackson",
-    "primary_skill": "Slash Chords",
-    "secondary_skills": "Funk rhythm & voice leading",
-    "difficulty_level": "Advanced",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": "Extended Chords",
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords / Rhythm Workshop",
     "teaching_notes": "Slash chords and funk rhythm - bridge is great for voice leading"
@@ -982,9 +982,9 @@
   {
     "title": "Isn't She Lovely",
     "artist": "Stevie Wonder",
-    "primary_skill": "Modal Interchange",
-    "secondary_skills": "Slash chords (A/B to E) & voice leading",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Similar to Mercy Mercy Me - also has slash chord A/B resolving to E major - kinda goes in with Mercy Mercy Me a little bit"
@@ -992,9 +992,9 @@
   {
     "title": "Hideaway",
     "artist": "Freddie King",
-    "primary_skill": "Rhythm & Blues",
-    "secondary_skills": "Shuffle to lead transitions",
-    "difficulty_level": "Advanced",
+    "skill_category": "Blues",
+    "secondary_skill_category": "Major Pentatonic",
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Major Pentatonic 101 / Phrasing",
     "teaching_notes": "Great for rhythm and transitioning from lead to shuffle grooves"
@@ -1002,9 +1002,9 @@
   {
     "title": "Chaka's in Love",
     "artist": "Ricky Lee Jones",
-    "primary_skill": "Major 7 Chords",
-    "secondary_skills": "70s laid back rhythm",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Great one for just laid back 70s rhythm and major 7 chords - competent or advanced"
@@ -1012,9 +1012,9 @@
   {
     "title": "Killer Queen",
     "artist": "Queen",
-    "primary_skill": "Following the Changes",
-    "secondary_skills": "Accurate bending",
-    "difficulty_level": "Advanced",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Accuracy of bending and following changes"
@@ -1022,9 +1022,9 @@
   {
     "title": "Crossroads",
     "artist": "Cream",
-    "primary_skill": "Blues / Mixing Pentatonics",
-    "secondary_skills": "Blues soloing",
-    "difficulty_level": "Advanced",
+    "skill_category": "Mixing Pentatonics",
+    "secondary_skill_category": "Blues",
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": "Mixing Pentatonics",
     "potential_masterclass": null,
     "teaching_notes": "Great blues solo mixing pentatonics"
@@ -1032,9 +1032,9 @@
   {
     "title": "Badge",
     "artist": "Cream",
-    "primary_skill": "Blues Language / Mixing Pentatonics",
-    "secondary_skills": "Pentatonic application",
-    "difficulty_level": "Advanced",
+    "skill_category": "Mixing Pentatonics",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": "Pentatonic Phrasing Course",
     "potential_masterclass": null,
     "teaching_notes": "Mixing blues language and pentatonic"
@@ -1042,9 +1042,9 @@
   {
     "title": "How Deep is Your Love",
     "artist": "Bee Gees",
-    "primary_skill": "Modal Interchange",
-    "secondary_skills": "7th chords",
-    "difficulty_level": "Advanced",
+    "skill_category": "Modes",
+    "secondary_skill_category": "Extended Chords",
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Modes Continued",
     "teaching_notes": "Modal interchange and complicated songwriting chords"
@@ -1052,9 +1052,9 @@
   {
     "title": "Let Me Be Lonely Tonight",
     "artist": "James Taylor",
-    "primary_skill": "7th Chords",
-    "secondary_skills": "Advanced harmony",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": "Modes",
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Really nice chords for advanced 7 chord song"
@@ -1062,9 +1062,9 @@
   {
     "title": "I Don't Know Why",
     "artist": "Norah Jones",
-    "primary_skill": "Spread Triads",
-    "secondary_skills": "Shell voicings",
-    "difficulty_level": "Advanced",
+    "skill_category": "Spread Triads",
+    "secondary_skill_category": "Extended Chords",
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": "Spread Triads / Slash",
     "potential_masterclass": null,
     "teaching_notes": "Spread triads and shell voicings - probably advanced"
@@ -1072,9 +1072,9 @@
   {
     "title": "Confessions",
     "artist": "Marcus King",
-    "primary_skill": "Mixing Minor and Dorian",
-    "secondary_skills": "Modal concepts",
-    "difficulty_level": "Advanced",
+    "skill_category": "Modes",
+    "secondary_skill_category": "Blues",
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Modes Continued",
     "teaching_notes": "Mixing F minor and F Dorian"
@@ -1082,9 +1082,9 @@
   {
     "title": "Hotel California",
     "artist": "Eagles",
-    "primary_skill": "Following the Changes",
-    "secondary_skills": "Arpeggio work",
-    "difficulty_level": "Advanced",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": "Arpeggios",
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": "Arpeggios",
     "potential_masterclass": null,
     "teaching_notes": "Great solo for following the changes"
@@ -1092,9 +1092,9 @@
   {
     "title": "Ricki Don't Lose That Number",
     "artist": "Steely Dan",
-    "primary_skill": "Following the Changes",
-    "secondary_skills": "Double stops",
-    "difficulty_level": "Advanced",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Last 4 bars highlight following changes with double stops"
@@ -1102,9 +1102,9 @@
   {
     "title": "Lenny",
     "artist": "Stevie Ray Vaughan",
-    "primary_skill": "Major 6 Chords",
-    "secondary_skills": "Major 13 chords",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Major 6 and major 13 chords"
@@ -1112,9 +1112,9 @@
   {
     "title": "It Runs Through Me",
     "artist": "Tom Misch",
-    "primary_skill": "7th Chords",
-    "secondary_skills": "Following changes",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Great for 7th chords with solo following changes"
@@ -1122,9 +1122,9 @@
   {
     "title": "Don't You Worry About a Thing",
     "artist": "Stevie Wonder",
-    "primary_skill": "Minor Line Cliche",
-    "secondary_skills": "Descending bass",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": "Following the Changes",
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Descending minor line cliche"
@@ -1132,9 +1132,9 @@
   {
     "title": "Golden Lady",
     "artist": "Stevie Wonder",
-    "primary_skill": "Minor Line Cliche",
-    "secondary_skills": "Descending bass",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Descending minor line cliche (same as Don't You Worry)"
@@ -1142,9 +1142,9 @@
   {
     "title": "Little Wing",
     "artist": "Jimi Hendrix",
-    "primary_skill": "Embellished Double Stops",
-    "secondary_skills": "Following changes",
-    "difficulty_level": "Advanced",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": "Extended Chords",
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Mixing Pentatonics",
     "teaching_notes": "Embellished double stop chord playing and following changes at the end"
@@ -1152,9 +1152,9 @@
   {
     "title": "Shape of My Heart",
     "artist": "Sting",
-    "primary_skill": "Spread Triads",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Spread Triads",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": "Spread Triads / Slash",
     "potential_masterclass": null,
     "teaching_notes": "Great for spread triads - advanced"
@@ -1162,9 +1162,9 @@
   {
     "title": "7 Days",
     "artist": "Sting",
-    "primary_skill": "Time Signatures",
-    "secondary_skills": "Leading diminished chords",
-    "difficulty_level": "Advanced",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": "Extended Chords",
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Time signatures and leading diminished chords"
@@ -1172,9 +1172,9 @@
   {
     "title": "Stairway to Heaven",
     "artist": "Led Zeppelin",
-    "primary_skill": "Minor Pentatonic",
-    "secondary_skills": "Targeting flat 6",
-    "difficulty_level": "Advanced",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Breaking Out of Box 1",
     "teaching_notes": "Predominantly minor pentatonic but occasionally targets flat 6"
@@ -1182,9 +1182,9 @@
   {
     "title": "I Could Have Lied",
     "artist": "Red Hot Chili Peppers",
-    "primary_skill": "Minor Pentatonic",
-    "secondary_skills": "Targeting flat 6",
-    "difficulty_level": "Advanced",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Breaking Out of Box 1",
     "teaching_notes": "Basically minor pentatonic solo but occasionally targets flat 6 from minor scale"
@@ -1192,9 +1192,9 @@
   {
     "title": "G Baby Ain't I Good to You",
     "artist": "Chaka Khan",
-    "primary_skill": "Jazz Blues Intro",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Mixing Pentatonics",
+    "secondary_skill_category": "Blues",
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "Mixing Pentatonics",
     "teaching_notes": "Introduction to jazz blues solo"
@@ -1202,9 +1202,9 @@
   {
     "title": "Smooth",
     "artist": "Santana",
-    "primary_skill": "Harmonic Minor",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Modes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Modes Continued",
     "teaching_notes": "Harmonic minor scale"
@@ -1212,9 +1212,9 @@
   {
     "title": "Black Cow",
     "artist": "Steely Dan",
-    "primary_skill": "Advanced 7th Chords",
-    "secondary_skills": "Tritone substitution",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "7th Arpeggios",
     "teaching_notes": "Advanced 7th chords including tritone subs"
@@ -1222,9 +1222,9 @@
   {
     "title": "I Keep Forgetting",
     "artist": "Michael McDonald",
-    "primary_skill": "80s Funk",
-    "secondary_skills": "Yacht rock grooves",
-    "difficulty_level": "Advanced",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Just funk 80s yacht rock funk grooves"
@@ -1232,9 +1232,9 @@
   {
     "title": "So Real",
     "artist": "Jeff Buckley",
-    "primary_skill": "Spread Triads",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Spread Triads",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Spread Triads / Slash",
     "teaching_notes": "Spread triads - that's difficult, advanced"
@@ -1242,9 +1242,9 @@
   {
     "title": "Something",
     "artist": "The Beatles",
-    "primary_skill": "Following the Changes",
-    "secondary_skills": "Secondary dominance & advanced voice leading",
-    "difficulty_level": "Advanced",
+    "skill_category": "Modes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": "Song Study: Something",
     "potential_masterclass": null,
     "teaching_notes": "Melodic solo following changes with secondary dominance - love for all sorts of reasons"
@@ -1252,9 +1252,9 @@
   {
     "title": "Jessica",
     "artist": "Allman Brothers",
-    "primary_skill": "Major Scale Lead",
-    "secondary_skills": "Harmonization",
-    "difficulty_level": "Advanced",
+    "skill_category": "Major Scale / Diatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Major Scale 101",
     "teaching_notes": "Major scale lead line with harmonization - does a bit of harmonization"
@@ -1262,9 +1262,9 @@
   {
     "title": "There's Never Too Much",
     "artist": "Luther Vandross",
-    "primary_skill": "Slash Chords",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": "Rhythm & Funk",
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Slash chords - advanced"
@@ -1272,9 +1272,9 @@
   {
     "title": "Rosanna",
     "artist": "Toto",
-    "primary_skill": "Closed Voice Triads",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Triads",
+    "secondary_skill_category": "Following the Changes",
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": "Triads",
     "potential_masterclass": null,
     "teaching_notes": "Great for closed voice triads - advanced"
@@ -1282,9 +1282,9 @@
   {
     "title": "Deacon Blues",
     "artist": "Steely Dan",
-    "primary_skill": "7th Chords",
-    "secondary_skills": "Advanced harmony",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Great for 7th chords - don't teach that too much - spiced Steely Dan"
@@ -1292,9 +1292,9 @@
   {
     "title": "All I Do",
     "artist": "Stevie Wonder",
-    "primary_skill": "Voice Leading",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "Nice kind of voice leading - couldn't have told that one for ages"
@@ -1302,9 +1302,9 @@
   {
     "title": "Sweet Little Angel",
     "artist": "B.B. King",
-    "primary_skill": "Mixing Minor/Major Pentatonic",
-    "secondary_skills": "Blues structure",
-    "difficulty_level": "Advanced",
+    "skill_category": "Mixing Pentatonics",
+    "secondary_skill_category": "Blues",
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": "Pentatonic Phrasing Course",
     "potential_masterclass": null,
     "teaching_notes": "Great for mixing minor and major pentatonic over blues structure"
@@ -1312,9 +1312,9 @@
   {
     "title": "Know Your Enemy",
     "artist": "Rage Against the Machine",
-    "primary_skill": "Syncopated Riffage",
-    "secondary_skills": "Off-beat rhythm",
-    "difficulty_level": "Advanced",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Rhythm Workshop",
     "teaching_notes": "Syncopated riffage - really off the beat there"
@@ -1322,9 +1322,9 @@
   {
     "title": "Easy Lover",
     "artist": "Phil Collins",
-    "primary_skill": "Solo Work",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Minor Pentatonic",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Great solo - haven't taught any of these for ages"
@@ -1332,9 +1332,9 @@
   {
     "title": "Master Blaster",
     "artist": "Stevie Wonder",
-    "primary_skill": "Unison Runs",
-    "secondary_skills": "Triads",
-    "difficulty_level": "Advanced",
+    "skill_category": "Triads",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Triads",
     "teaching_notes": "For the unison run and triads - love teaching Master Blaster"
@@ -1342,9 +1342,9 @@
   {
     "title": "Reelin' in the Years",
     "artist": "Steely Dan",
-    "primary_skill": "Advanced Lead",
-    "secondary_skills": "Following changes",
-    "difficulty_level": "Advanced",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "Pentatonic Phrasing Course",
     "teaching_notes": "Great one to teach - god just lead line - kind of advanced lead intro"
@@ -1352,9 +1352,9 @@
   {
     "title": "Midnight at the Oasis",
     "artist": "Maria Muldaur",
-    "primary_skill": "Modal Interchange",
-    "secondary_skills": "7th chords & advanced rhythm",
-    "difficulty_level": "Advanced",
+    "skill_category": "Modes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Modes Continued",
     "teaching_notes": "Great for modal interchange - 7th chords and advanced rhythm"
@@ -1362,9 +1362,9 @@
   {
     "title": "Billy's Bounce",
     "artist": "Charlie Parker",
-    "primary_skill": "Jazz Blues",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Blues",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Jazz blues"
@@ -1372,9 +1372,9 @@
   {
     "title": "Castles Made of Sand",
     "artist": "Jimi Hendrix",
-    "primary_skill": "Hendrix Double Stops",
-    "secondary_skills": null,
-    "difficulty_level": "Advanced",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Just Hendrix double stop stuff"
@@ -1382,9 +1382,9 @@
   {
     "title": "Couldn't Stand the Weather",
     "artist": "Stevie Ray Vaughan",
-    "primary_skill": "Funky Blues",
-    "secondary_skills": "16th note bluesy groove",
-    "difficulty_level": "Advanced",
+    "skill_category": "Rhythm & Funk",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Mixing Pentatonics",
     "teaching_notes": "That's like a funky 16 like bluesy kind of thing"
@@ -1392,9 +1392,9 @@
   {
     "title": "Comfortably Numb",
     "artist": "Pink Floyd",
-    "primary_skill": "Major & Minor Solos",
-    "secondary_skills": "Two distinct solos",
-    "difficulty_level": "Advanced",
+    "skill_category": "Major Pentatonic",
+    "secondary_skill_category": "Minor Pentatonic",
+    "difficulty_level": "Advanced 2",
     "existing_masterclass": null,
     "potential_masterclass": "Major Scale 101 / Breaking Out of Box 1",
     "teaching_notes": "For major solo and a minor solo as it were"
@@ -1402,9 +1402,9 @@
   {
     "title": "Mr. Sandman",
     "artist": "Chet Atkins",
-    "primary_skill": "Secondary Dominance",
-    "secondary_skills": "Arpeggiated work",
-    "difficulty_level": "Advanced",
+    "skill_category": "Modes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": null,
     "potential_masterclass": "Arpeggios",
     "teaching_notes": "Actually use that for slight re-revolving secondary dominance"
@@ -1412,9 +1412,9 @@
   {
     "title": "Oh! Darling",
     "artist": "The Beatles",
-    "primary_skill": "Augmented Chords",
-    "secondary_skills": "Secondary dominance",
-    "difficulty_level": "Advanced",
+    "skill_category": "Extended Chords",
+    "secondary_skill_category": null,
+    "difficulty_level": "Advanced 1",
     "existing_masterclass": null,
     "potential_masterclass": "Extended Chords",
     "teaching_notes": "My kind of like a bit like Need Your Love So Bad but all jumbled up and also starts with the augmented chord - good example of these in the augmented"
@@ -1422,9 +1422,9 @@
   {
     "title": "Sultans of Swing",
     "artist": "Dire Straits",
-    "primary_skill": "Following the Changes",
-    "secondary_skills": "Advanced fingerstyle",
-    "difficulty_level": "Advanced",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": "Arpeggios",
+    "difficulty_level": "Advanced 3",
     "existing_masterclass": "Song Study: Sultans of Swing",
     "potential_masterclass": null,
     "teaching_notes": "Advanced work following changes"
@@ -1432,9 +1432,9 @@
   {
     "title": "Kid Charlemagne",
     "artist": "Steely Dan",
-    "primary_skill": "Advanced Solo",
-    "secondary_skills": "Following changes",
-    "difficulty_level": "Master",
+    "skill_category": "Following the Changes",
+    "secondary_skill_category": null,
+    "difficulty_level": "Master 2",
     "existing_masterclass": null,
     "potential_masterclass": null,
     "teaching_notes": "Advanced guitar solo following changes"
