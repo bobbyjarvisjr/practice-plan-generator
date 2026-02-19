@@ -22,30 +22,27 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Helper function to get songs by difficulty
-function getSongsByDifficulty(difficulty) {
-  return curriculumData.filter(song => song.difficulty_level === difficulty);
+// Helper function to get songs by belt level (e.g. "Foundation" matches "Foundation 1", "Foundation 2", "Foundation 3")
+function getSongsByBelt(belt) {
+  return curriculumData.filter(song => song.difficulty_level.startsWith(belt));
 }
 
 // Build curriculum context for Claude
 function buildCurriculumContext() {
-  const byDifficulty = {
-    Foundation: getSongsByDifficulty('Foundation'),
-    Developing: getSongsByDifficulty('Developing'),
-    Competent: getSongsByDifficulty('Competent'),
-    Advanced: getSongsByDifficulty('Advanced'),
-    Master: getSongsByDifficulty('Master'),
-  };
+  const belts = ['Foundation', 'Developing', 'Competent', 'Advanced', 'Master'];
 
   let context = `# CURRICULUM DATABASE\n\n`;
-  context += `You have access to ${curriculumData.length} songs organized by difficulty level.\n\n`;
+  context += `You have access to ${curriculumData.length} songs organized by difficulty level.\n`;
+  context += `Difficulty uses a belt system: Foundation (easiest) → Developing → Competent → Advanced → Master (hardest).\n`;
+  context += `Each belt has sub-levels 1-3 (1=easier end, 3=harder end of that belt).\n\n`;
 
-  for (const [difficulty, songs] of Object.entries(byDifficulty)) {
-    context += `## ${difficulty} Level (${songs.length} songs)\n`;
+  for (const belt of belts) {
+    const songs = getSongsByBelt(belt);
+    context += `## ${belt} Level (${songs.length} songs)\n`;
     songs.forEach(song => {
-      let songLine = `- **${song.title}** by ${song.artist}`;
-      if (song.primary_skill) songLine += ` | Teaches: ${song.primary_skill}`;
-      if (song.secondary_skills) songLine += ` | Also: ${song.secondary_skills}`;
+      let songLine = `- **${song.title}** by ${song.artist} [${song.difficulty_level}]`;
+      if (song.skill_category) songLine += ` | Skill: ${song.skill_category}`;
+      if (song.secondary_skill_category) songLine += ` + ${song.secondary_skill_category}`;
       if (song.existing_masterclass) songLine += ` | [COURSE: ${song.existing_masterclass}]`;
       if (song.potential_masterclass) songLine += ` | [SUPPORTS: ${song.potential_masterclass}]`;
       context += songLine + '\n';
@@ -88,24 +85,29 @@ app.post('/api/generate-plan', async (req, res) => {
       .map(([key]) => key);
 
     // Build the system prompt
-    const systemPrompt = `You are an experienced guitar teacher creating a personalized practice plan.
+    const systemPrompt = `You are an experienced guitar teacher creating a personalized practice plan for a student.
 
-Your approach:
-- Be practical and direct
-- Focus on specific areas of weakness
-- Recommend songs that develop weak skills
-- Reference masterclasses that teach relevant concepts
-- Create a clear, actionable plan
+Your response has two parts:
 
-When recommending songs:
-1. If a song has an "Existing Masterclass" or "Teaches" note - mention it as "This is covered in [Masterclass Name]"
-2. If a song has a "Supports" note - mention it as "[Masterclass Name] would really help with this"
-3. Always explain WHY each song helps with their weak areas
-4. Suggest songs at appropriate difficulty (near their level, not a huge jump)
-5. Order recommendations from foundational to more advanced
-6. Aim to recommend 10-15 specific songs that form a logical progression
+PART 1 - ASSESSMENT (3-4 paragraphs):
+- Give an honest overview of where they're at based on their scores
+- Identify their 2-3 most important areas to develop
+- Explain WHY these areas matter for their playing
+- Be direct and specific, not generic
 
-Keep the tone conversational and encouraging, but practical. No corporate speak.`;
+PART 2 - SONG RECOMMENDATIONS (exactly 5-7 songs):
+- Pick songs that directly address their weak areas
+- Match difficulty to their level using the difficulty_level field (e.g. "Competent 2") - don't jump too far ahead
+- For each song: one clear sentence on why it helps, plus mention the masterclass if one exists
+- Order from most accessible to most challenging
+- Where a song has a secondary_skill_category, mention it briefly
+
+Rules:
+- Recommend EXACTLY 5-7 songs. Not more.
+- If a song has [COURSE: X] - say "covered in X"
+- If a song has [SUPPORTS: X] - say "X masterclass would complement this"
+- Tone: direct, encouraging, British guitar teacher. No corporate speak. No waffle.
+- Be concise. Every sentence should earn its place.`;
 
     // Build the user prompt
     const curriculumContext = buildCurriculumContext();
@@ -121,22 +123,17 @@ ${JSON.stringify(assessment, null, 2)}
 
 ${curriculumContext}
 
-TASK: Create a personalized practice plan that:
-1. Acknowledges their current level
-2. Identifies the 3-4 most important skills to work on
-3. Recommends 10-15 specific songs (with artist names) that will develop these skills
-4. For each song, explain WHY it helps and which masterclass covers it (if applicable)
-5. Suggests a rough order (what to tackle first, what comes next)
-6. Keeps it practical and doable - not overwhelming
+TASK: 
+1. Write a detailed assessment of this player (3-4 paragraphs) covering their current level, what's holding them back, and what to prioritise
+2. Recommend exactly 5-7 songs from the curriculum that will move the needle on their weakest areas
+3. For each song: one clear reason why it helps, difficulty level, and any relevant masterclass
 
-Format the response as clear, readable HTML that will be embedded in a web page. Use <h2>, <h3>, <p>, <ul>, <li> tags. Style any song recommendations in <div class="song-recommendation"> tags.
+Format as clean HTML for embedding in a web page. Use <h2>, <h3>, <p>, <ul>, <li> tags. Wrap each song in <div class="song-recommendation"> tags. Keep it tight - no padding, no repetition.
 
-Start with a brief assessment, then lay out the recommendations.`;
-
-    // Call Claude API with Sonnet model
+    // Call Claude API
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 2000,
+      max_tokens: 2500,
       system: systemPrompt,
       messages: [
         {
