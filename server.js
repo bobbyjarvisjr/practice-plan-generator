@@ -27,16 +27,6 @@ function getSongsByDifficulty(difficulty) {
   return curriculumData.filter(song => song.difficulty_level === difficulty);
 }
 
-// Helper function to get songs by skill
-function getSongsBySkill(skillKeyword) {
-  return curriculumData.filter(song => {
-    const primary = (song.primary_skill || '').toLowerCase();
-    const secondary = (song.secondary_skills || '').toLowerCase();
-    const keyword = skillKeyword.toLowerCase();
-    return primary.includes(keyword) || secondary.includes(keyword);
-  });
-}
-
 // Build curriculum context for Claude
 function buildCurriculumContext() {
   const byDifficulty = {
@@ -143,7 +133,7 @@ Format the response as clear, readable HTML that will be embedded in a web page.
 
 Start with a brief assessment, then lay out the recommendations.`;
 
-    // Call Claude API
+    // Call Claude API with Sonnet model
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 2000,
@@ -156,8 +146,13 @@ Start with a brief assessment, then lay out the recommendations.`;
       ]
     });
 
-    // Extract the response
-    const planText = message.content[0].type === 'text' ? message.content[0].text : '';
+    // Extract and clean the response
+    let planText = message.content[0].type === 'text' ? message.content[0].text : '';
+    
+    // Clean up any markdown code fence artifacts
+    planText = planText.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
+    planText = planText.replace(/^```\n?/i, '').replace(/\n?```$/i, '').trim();
+    planText = planText.replace(/^["']html["']\n?/i, '').trim();
 
     // Return as JSON
     res.json({
@@ -186,4 +181,5 @@ app.listen(PORT, () => {
   console.log(`✓ Server running on http://localhost:${PORT}`);
   console.log(`✓ Curriculum loaded: ${curriculumData.length} songs`);
   console.log(`✓ API endpoint: POST /api/generate-plan`);
+  console.log(`✓ Model: Claude Sonnet 4.5`);
 });
