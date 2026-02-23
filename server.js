@@ -31,14 +31,12 @@ function determinePlayerLevel(allScores) {
   var scoreValues = Object.values(allScores);
   if (scoreValues.length === 0) return 'beginner';
   var avg = scoreValues.reduce(function(a, b) { return a + b; }, 0) / scoreValues.length;
-  // Scale is 0-6
   if (avg <= 2) return 'beginner';
   if (avg <= 4) return 'intermediate';
   return 'advanced';
 }
 
 function buildCurriculumContext(playerLevel) {
-  var allBelts = ['Foundation', 'Developing', 'Competent', 'Advanced', 'Master'];
   var beltsToInclude;
 
   if (playerLevel === 'beginner') {
@@ -51,7 +49,7 @@ function buildCurriculumContext(playerLevel) {
 
   var context = '# CURRICULUM DATABASE\n\n';
   context += 'Songs organised by difficulty: Foundation (easiest) through to Master (hardest). Each belt has sub-levels 1-3.\n';
-  context += 'Songs marked [HAS MASTERCLASS] have a paid masterclass available - PRIORITISE these in recommendations.\n\n';
+  context += 'Songs marked [HAS MASTERCLASS] have a paid masterclass available - PRIORITISE these where they fit.\n\n';
 
   for (var i = 0; i < beltsToInclude.length; i++) {
     var belt = beltsToInclude[i];
@@ -105,7 +103,6 @@ app.post('/api/generate-plan', async function(req, res) {
       ? scoreValues.reduce(function(a, b) { return a + b; }, 0) / scoreValues.length
       : 0;
 
-    // Scale is 0-6
     var avgPercent = (avgScore / 6 * 100).toFixed(0);
 
     var weakAreas = Object.entries(allScores)
@@ -117,7 +114,7 @@ app.post('/api/generate-plan', async function(req, res) {
 
     var systemPrompt = 'You are J, an experienced British guitar teacher creating a personalised practice plan.\n\n' +
 
-      'RATING SCALE (0-6) — interpret scores using this:\n' +
+      'RATING SCALE (0-6):\n' +
       '0 = No knowledge at all\n' +
       '1 = Started learning but not using it yet\n' +
       '2 = Just starting to implement it\n' +
@@ -127,27 +124,31 @@ app.post('/api/generate-plan', async function(req, res) {
       '6 = Mastered across the entire neck\n\n' +
 
       'MASTERCLASS PRIORITY RULE:\n' +
-      'Always prioritise songs marked [HAS MASTERCLASS] where they fit the student\'s level and needs. ' +
-      'When recommending one of these songs, include a clear call-to-action mentioning the masterclass by name and linking to the library: ' + MASTERCLASS_LIBRARY_URL + '\n' +
-      'Format it as: "This is covered in the [masterclass name] — check it out in the masterclass library."\n\n' +
+      'Prioritise songs marked [HAS MASTERCLASS] where they fit the student\'s weak areas and level. ' +
+      'When recommending one, mention the masterclass by name and include this link: ' + MASTERCLASS_LIBRARY_URL + '\n' +
+      'Format: "This is covered in the [masterclass name] — <a href="' + MASTERCLASS_LIBRARY_URL + '" target="_blank" class="masterclass-link">check it out in the masterclass library</a>."\n\n' +
 
-      'SONG VARIETY RULE:\n' +
-      'Draw from the full range of songs in the curriculum. Do not default to obvious or well-known choices. ' +
-      'Pick songs that genuinely best fit this specific student\'s gaps.\n\n' +
-
-      'RESPONSE FORMAT:\n\n' +
+      'YOUR RESPONSE HAS TWO PARTS THAT MUST BE DIRECTLY CONNECTED:\n\n' +
 
       'PART 1 — ASSESSMENT (3-4 paragraphs):\n' +
       '- Honest overview of where they are based on their scores\n' +
-      '- Their 2-3 most important areas to develop\n' +
-      '- Why these areas matter for their playing\n' +
-      '- Direct and specific, not generic\n\n' +
+      '- Identify their 2-3 most important weak areas with clear reasons why they matter\n' +
+      '- Be specific about what is holding them back\n\n' +
 
       'PART 2 — SONG RECOMMENDATIONS (exactly 5-7 songs):\n' +
-      '- Masterclass songs first where they fit, then other curriculum songs\n' +
-      '- Match difficulty carefully to their level — do not jump too far ahead\n' +
-      '- For each song: one clear sentence on why it helps, difficulty level, and masterclass call-to-action if applicable\n' +
+      '- CRITICAL: Every single song must directly address one of the weak areas you identified in Part 1\n' +
+      '- If you said triads are a priority, most songs must specifically work on triads\n' +
+      '- If you said timing is a priority, include songs that specifically develop timing\n' +
+      '- A reader must be able to look at each song and immediately see why it was chosen based on your assessment\n' +
+      '- The assessment and song list must feel like one connected plan, not two separate things\n' +
+      '- Prioritise masterclass songs first where they address the weak areas\n' +
+      '- Match difficulty to their level — do not jump too far ahead\n' +
       '- Order from most accessible to most challenging\n\n' +
+
+      'SONG TITLE FORMAT:\n' +
+      '- Write song titles as: Song Title — Artist\n' +
+      '- Do NOT include the difficulty level in the title\n' +
+      '- Mention difficulty naturally in the description instead if needed\n\n' +
 
       'RULES:\n' +
       '- Recommend EXACTLY 5-7 songs. Not more, not less.\n' +
@@ -155,17 +156,18 @@ app.post('/api/generate-plan', async function(req, res) {
       '- Every sentence earns its place.\n' +
       '- Format as clean HTML using <h2>, <h3>, <p>, <ul>, <li> tags.\n' +
       '- Wrap each song in <div class="song-recommendation"> tags.\n' +
-      '- For masterclass links use: <a href="' + MASTERCLASS_LIBRARY_URL + '" target="_blank" class="masterclass-link">View Masterclass Library</a>';
+      '- Song title in <strong> tags inside the recommendation div.';
 
     var assessmentSummary =
       'PLAYER ASSESSMENT:\n' +
-      '- Overall level: ' + playerLevel + ' (' + avgPercent + '% average across answered questions, scale 0-6)\n' +
+      '- Overall level: ' + playerLevel + ' (' + avgPercent + '% average, scale 0-6)\n' +
       '- Weak areas (scored 0-2): ' + (weakAreas.length > 0 ? weakAreas.slice(0, 5).join(', ') : 'No major weak areas') + '\n' +
       '- Self-reported struggles: ' + (assessment.struggles.length > 0 ? assessment.struggles.join(', ') : 'None specified') + '\n\n' +
       'Full scores (0-6 scale):\n' +
       JSON.stringify(assessment, null, 2) + '\n\n' +
       curriculumContext + '\n\n' +
-      'Write the assessment and recommend exactly 5-7 songs. Masterclass songs first where they fit. Include the library link for any masterclass song.';
+      'Write the assessment identifying the 2-3 key priorities, then recommend exactly 5-7 songs that directly address those priorities. ' +
+      'Every song must be chosen because it works on a weakness you named in the assessment. Masterclass songs first where they fit.';
 
     var message = await anthropic.messages.create({
       model: 'claude-sonnet-4-5',
@@ -176,7 +178,6 @@ app.post('/api/generate-plan', async function(req, res) {
 
     var planText = message.content[0].type === 'text' ? message.content[0].text : '';
 
-    // Strip markdown code fences if present
     planText = planText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
 
     res.json({ plan: planText });
