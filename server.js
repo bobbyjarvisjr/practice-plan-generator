@@ -117,7 +117,7 @@ app.post('/api/generate-plan', async function(req, res) {
 
       'MASTERCLASS RULES:\n' +
       '- Prioritise songs marked [HAS MASTERCLASS] where they match the weak areas\n' +
-      '- When a song has [HAS MASTERCLASS: X], say: "This is covered in my X masterclass." and add: <a href="' + MASTERCLASS_LIBRARY_URL + '" target="_blank" class="masterclass-link">View Masterclass Library</a>\n' +
+      '- When a song has [HAS MASTERCLASS: X], say: "This is covered in my <strong>X</strong> masterclass." and add: <a href="' + MASTERCLASS_LIBRARY_URL + '" target="_blank" class="masterclass-link">View Masterclass Library</a>\n' +
       '- ONLY use the exact masterclass name from the [HAS MASTERCLASS: X] tag — never invent or guess a masterclass name\n' +
       '- If a song has no [HAS MASTERCLASS] tag, do not mention a masterclass at all\n\n' +
 
