@@ -15,6 +15,8 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const MASTERCLASS_LIBRARY_URL = 'https://www.bobbyjarvisjr.com/collections/all';
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
@@ -25,28 +27,61 @@ function getSongsByBelt(belt) {
   });
 }
 
-function buildCurriculumContext() {
-  var belts = ['Foundation', 'Developing', 'Competent', 'Advanced', 'Master'];
-  var context = '# CURRICULUM DATABASE\n\n';
-  context += 'You have access to ' + curriculumData.length + ' songs organized by difficulty level.\n';
-  context += 'Difficulty uses a belt system: Foundation (easiest) to Developing to Competent to Advanced to Master (hardest).\n';
-  context += 'Each belt has sub-levels 1-3 (1=easier end, 3=harder end of that belt).\n\n';
+function buildCurriculumContext(playerLevel) {
+  // Determine which belt levels to include based on player level
+  // This keeps the prompt lean and relevant
+  var allBelts = ['Foundation', 'Developing', 'Competent', 'Advanced', 'Master'];
+  var beltsToInclude;
 
-  for (var i = 0; i < belts.length; i++) {
-    var belt = belts[i];
+  if (playerLevel === 'beginner') {
+    beltsToInclude = ['Foundation', 'Developing'];
+  } else if (playerLevel === 'intermediate') {
+    beltsToInclude = ['Developing', 'Competent', 'Advanced'];
+  } else if (playerLevel === 'advanced') {
+    beltsToInclude = ['Competent', 'Advanced', 'Master'];
+  } else {
+    beltsToInclude = allBelts;
+  }
+
+  var context = '# CURRICULUM DATABASE\n\n';
+  context += 'Songs are organized by difficulty: Foundation (easiest) → Developing → Competent → Advanced → Master (hardest).\n';
+  context += 'Each belt has sub-levels 1-3.\n';
+  context += 'Songs marked [HAS MASTERCLASS] have a paid masterclass available - PRIORITISE these in recommendations.\n';
+  context += 'Songs without a masterclass tag are still valid curriculum songs.\n\n';
+
+  for (var i = 0; i < beltsToInclude.length; i++) {
+    var belt = beltsToInclude[i];
     var songs = getSongsByBelt(belt);
+
+    // Sort: masterclass songs first, then others
+    songs.sort(function(a, b) {
+      var aHas = a.existing_masterclass ? 1 : 0;
+      var bHas = b.existing_masterclass ? 1 : 0;
+      return bHas - aHas;
+    });
+
     context += '## ' + belt + ' Level (' + songs.length + ' songs)\n';
     songs.forEach(function(song) {
       var songLine = '- **' + song.title + '** by ' + song.artist + ' [' + song.difficulty_level + ']';
       if (song.skill_category) songLine += ' | Skill: ' + song.skill_category;
       if (song.secondary_skill_category) songLine += ' + ' + song.secondary_skill_category;
-      if (song.existing_masterclass) songLine += ' | [COURSE: ' + song.existing_masterclass + ']';
-      if (song.potential_masterclass) songLine += ' | [SUPPORTS: ' + song.potential_masterclass + ']';
+      if (song.section) songLine += ' | Section: ' + song.section;
+      if (song.existing_masterclass) songLine += ' | [HAS MASTERCLASS: ' + song.existing_masterclass + ']';
       context += songLine + '\n';
     });
     context += '\n';
   }
   return context;
+}
+
+function determinePlayerLevel(allScores) {
+  var scoreValues = Object.values(allScores);
+  if (scoreValues.length === 0) return 'beginner';
+  var avg = scoreValues.reduce(function(a, b) { return a + b; }, 0) / scoreValues.length;
+  // Scale is now 0-6
+  if (avg <= 2) return 'beginner';
+  if (avg <= 4) return 'intermediate';
+  return 'advanced';
 }
 
 app.post('/api/generate-plan', async function(req, res) {
@@ -76,44 +111,72 @@ app.post('/api/generate-plan', async function(req, res) {
       ? scoreValues.reduce(function(a, b) { return a + b; }, 0) / scoreValues.length
       : 0;
 
+    // Scale is 0-6, so divide by 6 for percentage
+    var avgPercent = (avgScore / 6 * 100).toFixed(0);
+
     var weakAreas = Object.entries(allScores)
       .filter(function(entry) { return entry[1] <= 2; })
       .map(function(entry) { return entry[0]; });
 
-    var systemPrompt = 'You are an experienced guitar teacher creating a personalized practice plan for a student.\n\n' +
+    var playerLevel = determinePlayerLevel(allScores);
+
+    var systemPrompt = 'You are J, an experienced British guitar teacher creating a personalised practice plan.\n\n' +
+
+      'RATING SCALE REFERENCE (so you interpret scores correctly):\n' +
+      '0 = No knowledge at all\n' +
+      '1 = Started learning but not using it yet\n' +
+      '2 = Just starting to implement it\n' +
+      '3 = Using it but still thinking about it\n' +
+      '4 = Using it fairly confidently, occasionally get lost\n' +
+      '5 = Using it confidently and fluently\n' +
+      '6 = Mastered across the entire neck\n\n' +
+
+      'MASTERCLASS PRIORITY RULE:\n' +
+      'Songs marked [HAS MASTERCLASS] should be prioritised in your recommendations where they match the student\'s level and needs. ' +
+      'When recommending one of these songs, always include a clear call-to-action: mention the masterclass by name and include this link: ' + MASTERCLASS_LIBRARY_URL + '\n' +
+      'Format it like: "This is covered in the [masterclass name] — available in the complete masterclass library at ' + MASTERCLASS_LIBRARY_URL + '"\n\n' +
+
+      'SONG VARIETY RULE:\n' +
+      'Draw from the full range of songs in the curriculum. Do not default to well-known or obvious choices. ' +
+      'Pick the songs that genuinely best fit this specific student\'s gaps, even if they are less well-known.\n\n' +
+
       'Your response has two parts:\n\n' +
+
       'PART 1 - ASSESSMENT (3-4 paragraphs):\n' +
-      '- Give an honest overview of where they are at based on their scores\n' +
+      '- Give an honest overview of where they are based on their scores\n' +
       '- Identify their 2-3 most important areas to develop\n' +
       '- Explain WHY these areas matter for their playing\n' +
       '- Be direct and specific, not generic\n\n' +
+
       'PART 2 - SONG RECOMMENDATIONS (exactly 5-7 songs):\n' +
-      '- Pick songs that directly address their weak areas\n' +
-      '- Match difficulty to their level using the difficulty_level field (e.g. "Competent 2") - do not jump too far ahead\n' +
-      '- For each song: one clear sentence on why it helps, difficulty level, and any relevant masterclass\n' +
-      '- Order from most accessible to most challenging\n' +
-      '- Where a song has a secondary_skill_category, mention it briefly\n\n' +
+      '- Prioritise songs with a masterclass attached first, then other curriculum songs\n' +
+      '- Match difficulty carefully to their level — do not jump too far ahead\n' +
+      '- For each song: one clear sentence on why it helps them specifically, the difficulty level, section if relevant, and any masterclass call-to-action\n' +
+      '- Order from most accessible to most challenging\n\n' +
+
       'Rules:\n' +
-      '- Recommend EXACTLY 5-7 songs. Not more.\n' +
-      '- If a song has [COURSE: X] - say "covered in X"\n' +
-      '- If a song has [SUPPORTS: X] - say "X masterclass would complement this"\n' +
-      '- Tone: direct, encouraging, British guitar teacher. No corporate speak. No waffle.\n' +
-      '- Be concise. Every sentence should earn its place.';
+      '- Recommend EXACTLY 5-7 songs. Not more, not less.\n' +
+      '- Tone: direct, honest, encouraging. British. No corporate waffle.\n' +
+      '- Be concise. Every sentence earns its place.\n' +
+      '- Format as clean HTML using <h2>, <h3>, <p>, <ul>, <li> tags.\n' +
+      '- Wrap each song in <div class="song-recommendation"> tags.\n' +
+      '- For masterclass call-to-actions use: <a href="' + MASTERCLASS_LIBRARY_URL + '" target="_blank" class="masterclass-link">View Masterclass Library</a>';
 
-    var curriculumContext = buildCurriculumContext();
+    // Only pass relevant curriculum sections based on player level
+    var curriculumContext = buildCurriculumContext(playerLevel);
 
-    var assessmentSummary = '\nASSESSMENT RESULTS:\n' +
-      '- Average technical level: ' + (avgScore / 5 * 100).toFixed(0) + '%\n' +
-      '- Main weak areas: ' + (weakAreas.length > 0 ? weakAreas.slice(0, 5).join(', ') : 'Overall development needed') + '\n' +
+    var assessmentSummary = 'ASSESSMENT RESULTS:\n' +
+      '- Overall level: ' + playerLevel + ' (' + avgPercent + '% average across answered questions)\n' +
+      '- Main weak areas (scored 0-2): ' + (weakAreas.length > 0 ? weakAreas.slice(0, 5).join(', ') : 'No major weak areas identified') + '\n' +
       '- Self-reported struggles: ' + (assessment.struggles.length > 0 ? assessment.struggles.join(', ') : 'None specified') + '\n\n' +
-      'Detailed scores:\n' +
+      'Detailed scores (scale 0-6):\n' +
       JSON.stringify(assessment, null, 2) + '\n\n' +
       curriculumContext + '\n\n' +
       'TASK:\n' +
-      '1. Write a detailed assessment of this player (3-4 paragraphs) covering their current level, what is holding them back, and what to prioritise\n' +
-      '2. Recommend exactly 5-7 songs from the curriculum that will move the needle on their weakest areas\n' +
-      '3. For each song: one clear reason why it helps, difficulty level, and any relevant masterclass\n\n' +
-      'Format as clean HTML for embedding in a web page. Use <h2>, <h3>, <p>, <ul>, <li> tags. Wrap each song in <div class="song-recommendation"> tags. Keep it tight - no padding, no repetition.';
+      '1. Write a detailed assessment of this player based on their scores\n' +
+      '2. Recommend exactly 5-7 songs — masterclass songs first where they fit, then other curriculum songs\n' +
+      '3. For any song with a masterclass, include the call-to-action with the library link\n' +
+      '4. Keep it tight — no padding, no repetition';
 
     var message = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
