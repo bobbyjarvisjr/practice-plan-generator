@@ -108,28 +108,32 @@ app.post('/api/generate-plan', async function(req, res) {
 
       'PART 2 - SONG RECOMMENDATIONS (exactly 5-7 songs):\n' +
       '- Use the Skill: field in the curriculum to match songs to the weak areas you identified in Part 1\n' +
-      '- If triads are a weak area, pick songs where Skill: Triads\n' +
+      '- If triads are weak, pick songs where Skill: Triads\n' +
       '- If major pentatonic is weak, pick songs where Skill: Major Pentatonic\n' +
       '- The Skill: field is your PRIMARY filter. Difficulty level is secondary.\n' +
-      '- Every song must directly address a weak area from your assessment\n' +
-      '- Prioritise songs marked [HAS MASTERCLASS] where they match the weak areas\n' +
-      '- When recommending a masterclass song, name it and include this link: ' + MASTERCLASS_LIBRARY_URL + '\n' +
+      '- Every song must directly address a weak area you named in your assessment\n' +
       '- Do not jump too far ahead on difficulty\n' +
       '- Order from most accessible to most challenging\n\n' +
 
+      'MASTERCLASS RULES:\n' +
+      '- Prioritise songs marked [HAS MASTERCLASS] where they match the weak areas\n' +
+      '- When a song has [HAS MASTERCLASS: X], say: "This is covered in my X masterclass." and add: <a href="' + MASTERCLASS_LIBRARY_URL + '" target="_blank" class="masterclass-link">View Masterclass Library</a>\n' +
+      '- ONLY use the exact masterclass name from the [HAS MASTERCLASS: X] tag — never invent or guess a masterclass name\n' +
+      '- If a song has no [HAS MASTERCLASS] tag, do not mention a masterclass at all\n\n' +
+
       'SONG TITLE FORMAT: Song Title — Artist (no difficulty label in the title)\n\n' +
 
-      'RULES:\n' +
+      'FORMAT RULES:\n' +
       '- Recommend EXACTLY 5-7 songs. Not more, not less.\n' +
       '- Tone: direct, honest, encouraging. British. No waffle.\n' +
-      '- Format as clean HTML: <h2>, <h3>, <p>, <ul>, <li> tags.\n' +
-      '- Wrap each song in <div class="song-recommendation"> tags.\n' +
-      '- Song title in <strong> tags.\n' +
-      '- For masterclass links use: <a href="' + MASTERCLASS_LIBRARY_URL + '" target="_blank" class="masterclass-link">View Masterclass Library</a>';
+      '- Clean HTML only: <h2>, <h3>, <p>, <ul>, <li> tags\n' +
+      '- Wrap each song in <div class="song-recommendation"> tags\n' +
+      '- Song title in <strong> tags';
 
     var curriculumContext = buildCurriculumContext();
 
-    var assessmentSummary = '\nASSESSMENT RESULTS:\n' +
+    var assessmentSummary =
+      'ASSESSMENT RESULTS:\n' +
       '- Average technical level: ' + (avgScore / 6 * 100).toFixed(0) + '%\n' +
       '- Main weak areas (scored 0-2): ' + (weakAreas.length > 0 ? weakAreas.slice(0, 5).join(', ') : 'Overall development needed') + '\n' +
       '- Self-reported struggles: ' + (assessment.struggles.length > 0 ? assessment.struggles.join(', ') : 'None specified') + '\n\n' +
@@ -138,9 +142,10 @@ app.post('/api/generate-plan', async function(req, res) {
       curriculumContext + '\n\n' +
       'TASK:\n' +
       '1. Write the assessment identifying 2-3 key weak areas\n' +
-      '2. Recommend exactly 5-7 songs from the curriculum - use the Skill: field to match songs to the weak areas you named\n' +
+      '2. Recommend exactly 5-7 songs - use the Skill: field to match songs directly to the weak areas you named\n' +
       '3. Every song must justify itself against a specific weakness from your assessment\n' +
-      '4. Masterclass songs first where they match the weak areas\n\n' +
+      '4. For any song with [HAS MASTERCLASS: X], use that exact name and include the library link\n' +
+      '5. Never invent a masterclass name\n\n' +
       'Format as clean HTML. Use <h2>, <h3>, <p>, <ul>, <li> tags. Wrap each song in <div class="song-recommendation"> tags.';
 
     var message = await anthropic.messages.create({
