@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const Anthropic = require('@anthropic-ai/sdk');
+const { Resend } = require('resend');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,7 +16,22 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const MASTERCLASS_LIBRARY_URL = 'https://www.bobbyjarvisjr.com/collections/all';
+const FROM_EMAIL = 'jarvis@bobbyjarvisjr.com';
+const LEADS_FILE = path.join('/tmp', 'leads.csv');
+
+// Initialise CSV file if it doesn't exist
+if (!fs.existsSync(LEADS_FILE)) {
+  fs.writeFileSync(LEADS_FILE, 'Name,Email,Date\n');
+}
+
+function saveLead(name, email) {
+  const date = new Date().toISOString();
+  const line = `"${name}","${email}","${date}"\n`;
+  fs.appendFileSync(LEADS_FILE, line);
+}
 
 app.use(cors());
 app.use(express.json());
@@ -59,9 +75,49 @@ function buildCurriculumContext() {
   return context;
 }
 
+function buildEmailHTML(name, planHTML) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Georgia, serif; background: #f5f5f0; margin: 0; padding: 20px; color: #2c2c2c; }
+    .container { max-width: 680px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 4px; }
+    h1 { color: #1a472a; font-size: 24px; margin-bottom: 4px; }
+    h2 { color: #1a472a; font-size: 20px; margin-top: 32px; }
+    h3 { color: #2c5f3f; font-size: 16px; margin-bottom: 4px; }
+    .song-recommendation { background: #f9f9f6; border-left: 3px solid #2c5f3f; padding: 16px 20px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+    .masterclass-link { color: #2c5f3f; font-weight: bold; }
+    p { line-height: 1.7; }
+    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your Guitar Practice Plan</h1>
+    <p>Hey ${name}, here's your personalised practice plan. Save this email — it's yours to refer back to whenever you need it.</p>
+    ${planHTML}
+    <div class="footer">
+      <p>Questions? Head to <a href="https://www.bobbyjarvisjr.com" style="color:#2c5f3f;">bobbyjarvisjr.com</a> to explore the full masterclass library.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
 app.post('/api/generate-plan', async function(req, res) {
   try {
     var body = req.body;
+    var name = (body.name || '').trim();
+    var email = (body.email || '').trim();
+
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required' });
+    }
+
     var assessment = {
       scales: body.scales || {},
       triads: body.triads || {},
@@ -158,12 +214,35 @@ app.post('/api/generate-plan', async function(req, res) {
     var planText = message.content[0].type === 'text' ? message.content[0].text : '';
     planText = planText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
 
+    // Save lead to CSV
+    saveLead(name, email);
+
+    // Send email via Resend
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: 'Your Personalised Guitar Practice Plan',
+      html: buildEmailHTML(name, planText)
+    });
+
     res.json({ plan: planText });
 
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: error.message || 'Failed to generate practice plan' });
   }
+});
+
+// Download leads CSV
+app.get('/leads', function(req, res) {
+  const token = req.query.token;
+  if (token !== process.env.LEADS_TOKEN) {
+    return res.status(401).send('Unauthorised');
+  }
+  if (!fs.existsSync(LEADS_FILE)) {
+    return res.status(404).send('No leads yet');
+  }
+  res.download(LEADS_FILE, 'leads.csv');
 });
 
 app.get('/health', function(req, res) {
@@ -177,5 +256,4 @@ app.get('/', function(req, res) {
 app.listen(PORT, function() {
   console.log('Server running on port ' + PORT);
   console.log('Curriculum loaded: ' + curriculumData.length + ' songs');
-  console.log('API endpoint: POST /api/generate-plan');
 });
