@@ -3,16 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mayo Dojo Practice Plan Generator</title>
+    <title>Guitar Practice Plan Generator</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             color: #333;
             line-height: 1.6;
@@ -25,7 +21,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
 
@@ -36,24 +32,15 @@
             text-align: center;
         }
 
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; font-weight: 600; }
+        .header p { font-size: 14px; opacity: 0.9; }
 
         .scale-legend {
             background: #f0f7f2;
             border: 1px solid #c8e6c9;
             border-radius: 8px;
             padding: 20px 25px;
-            margin: 0 30px 30px;
-            margin-top: 30px;
+            margin: 30px 30px 0;
         }
 
         .scale-legend h3 {
@@ -65,10 +52,7 @@
             margin-bottom: 12px;
         }
 
-        .scale-legend-grid {
-            display: grid;
-            gap: 6px;
-        }
+        .scale-legend-grid { display: grid; gap: 6px; }
 
         .scale-legend-item {
             display: flex;
@@ -78,23 +62,12 @@
             line-height: 1.4;
         }
 
-        .scale-legend-num {
-            font-weight: 700;
-            color: #1a472a;
-            min-width: 16px;
-        }
+        .scale-legend-num { font-weight: 700; color: #1a472a; min-width: 16px; }
 
-        .content {
-            padding: 0 30px 40px;
-        }
+        .content { padding: 0 30px 40px; }
 
-        .form-section {
-            margin-bottom: 40px;
-        }
-
-        .form-section.hidden {
-            display: none;
-        }
+        .form-section { margin-bottom: 40px; margin-top: 30px; }
+        .form-section.hidden { display: none; }
 
         .section-title {
             font-size: 16px;
@@ -107,9 +80,7 @@
             padding-bottom: 10px;
         }
 
-        .question {
-            margin-bottom: 28px;
-        }
+        .question { margin-bottom: 28px; }
 
         .question-text {
             font-size: 14px;
@@ -119,17 +90,9 @@
             display: block;
         }
 
-        .scale-options {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
+        .scale-options { display: flex; gap: 6px; flex-wrap: wrap; }
 
-        .scale-option {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .scale-option { display: flex; flex-direction: column; align-items: center; }
 
         .scale-option input[type="radio"] {
             cursor: pointer;
@@ -158,15 +121,9 @@
             border-color: #1a472a;
         }
 
-        .weakness-checkboxes {
-            display: grid;
-            gap: 10px;
-        }
+        .weakness-checkboxes { display: grid; gap: 10px; }
 
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-        }
+        .checkbox-item { display: flex; align-items: center; }
 
         .checkbox-item input[type="checkbox"] {
             margin-right: 10px;
@@ -176,10 +133,54 @@
             accent-color: #1a472a;
         }
 
-        .checkbox-item label {
-            cursor: pointer;
+        .checkbox-item label { cursor: pointer; font-size: 13px; color: #555; }
+
+        /* Email capture section */
+        .email-gate {
+            background: #f0f7f2;
+            border: 2px solid #1a472a;
+            border-radius: 8px;
+            padding: 28px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .email-gate h3 {
+            font-size: 18px;
+            color: #1a472a;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .email-gate p {
             font-size: 13px;
             color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .email-gate-fields { display: grid; gap: 12px; }
+
+        .field-group { display: flex; flex-direction: column; gap: 6px; }
+
+        .field-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .field-group input {
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        .field-group input:focus {
+            outline: none;
+            border-color: #1a472a;
         }
 
         .submit-btn {
@@ -187,34 +188,31 @@
             color: white;
             border: none;
             padding: 14px 40px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             border-radius: 6px;
             cursor: pointer;
             width: 100%;
             transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 20px;
+            margin-top: 8px;
         }
 
         .submit-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(26, 71, 42, 0.3);
+            box-shadow: 0 10px 20px rgba(26,71,42,0.3);
         }
 
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .loading {
-            display: none;
+        .privacy-note {
+            font-size: 11px;
+            color: #888;
             text-align: center;
-            padding: 40px 20px;
+            margin-top: 10px;
         }
 
-        .loading.active {
-            display: block;
-        }
+        .loading { display: none; text-align: center; padding: 60px 20px; }
+        .loading.active { display: block; }
 
         .spinner {
             border: 3px solid #e0e0e0;
@@ -226,55 +224,20 @@
             margin: 0 auto 20px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .loading p { color: #555; font-size: 14px; }
 
-        .results {
-            display: none;
-            animation: fadeIn 0.5s ease-in;
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .results.active {
-            display: block;
-        }
+        .results { display: none; animation: fadeIn 0.5s ease-in; }
+        .results.active { display: block; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .results h2 {
-            font-size: 20px;
-            color: #1a472a;
-            margin-bottom: 20px;
-            margin-top: 30px;
-        }
-
-        .results h3 {
-            font-size: 16px;
-            color: #2d5a3d;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .results p, .results li {
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 10px;
-            line-height: 1.7;
-        }
-
-        .results ul {
-            margin-left: 20px;
-            margin-bottom: 15px;
-        }
-
-        .results li {
-            margin-bottom: 12px;
-        }
+        .results h2 { font-size: 20px; color: #1a472a; margin-bottom: 20px; margin-top: 30px; }
+        .results h3 { font-size: 16px; color: #2d5a3d; margin-top: 25px; margin-bottom: 15px; font-weight: 600; }
+        .results p, .results li { font-size: 13px; color: #555; margin-bottom: 10px; line-height: 1.7; }
+        .results ul { margin-left: 20px; margin-bottom: 15px; }
+        .results li { margin-bottom: 12px; }
 
         .song-recommendation {
             background: #f5f5f5;
@@ -284,9 +247,22 @@
             border-radius: 4px;
         }
 
-        .song-recommendation strong {
-            color: #1a472a;
+        .song-recommendation strong { color: #1a472a; }
+
+        .masterclass-link { color: #1a472a; font-weight: 600; }
+
+        .email-confirmation {
+            background: #f0f7f2;
+            border: 1px solid #c8e6c9;
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 0 30px 20px;
+            font-size: 13px;
+            color: #2d5a3d;
+            display: none;
         }
+
+        .email-confirmation.active { display: block; }
 
         .error {
             background: #fee;
@@ -297,17 +273,10 @@
             display: none;
         }
 
-        .error.active {
-            display: block;
-        }
+        .error.active { display: block; }
 
-        .form-wrapper {
-            display: block;
-        }
-
-        .form-wrapper.hidden {
-            display: none;
-        }
+        .form-wrapper { display: block; }
+        .form-wrapper.hidden { display: none; }
 
         .unlock-notice {
             font-size: 12px;
@@ -324,8 +293,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Your Practice Plan</h1>
-            <p>Answer these questions honestly and get a personalised plan based on where you're actually at</p>
+            <h1>Your Guitar Practice Plan</h1>
+            <p>Answer honestly and get a personalised plan based on where you're actually at</p>
         </div>
 
         <div class="scale-legend">
@@ -347,7 +316,7 @@
             <div class="form-wrapper" id="formWrapper">
                 <form id="assessmentForm">
 
-                    <!-- SECTION 1: FOUNDATIONS — everyone sees this -->
+                    <!-- FOUNDATIONS -->
                     <div class="form-section" id="section-foundations">
                         <div class="section-title">Foundations</div>
 
@@ -404,7 +373,7 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 2: TRIADS — unlocks when major_scale >= 3 -->
+                    <!-- TRIADS — unlocks when major_scale >= 3 -->
                     <div class="form-section hidden" id="section-triads">
                         <div class="section-title">Triads</div>
                         <div class="unlock-notice">Unlocked because your major scale is coming along — triads are the next logical step.</div>
@@ -449,7 +418,7 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 3: 7TH CHORDS — unlocks when bar_chords >= 2 -->
+                    <!-- 7TH CHORDS — unlocks when bar_chords >= 2 -->
                     <div class="form-section hidden" id="section-seventh-chords">
                         <div class="section-title">Chords & Harmony</div>
                         <div class="unlock-notice">Unlocked because your bar chords are coming along — time to explore chord extensions.</div>
@@ -520,7 +489,7 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 4: ARPEGGIOS — unlocks when major_triads OR minor_triads >= 2 -->
+                    <!-- ARPEGGIOS — unlocks when major_triads OR minor_triads >= 2 -->
                     <div class="form-section hidden" id="section-arpeggios">
                         <div class="section-title">Arpeggios</div>
                         <div class="unlock-notice">Unlocked because your triads are developing — arpeggios are the natural next step.</div>
@@ -552,7 +521,7 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 5: ADVANCED — unlocks when major_arps OR minor_arps >= 2 -->
+                    <!-- ADVANCED — unlocks when major_arps OR minor_arps >= 2 -->
                     <div class="form-section hidden" id="section-advanced">
                         <div class="section-title">Advanced Harmony</div>
                         <div class="unlock-notice">Unlocked because your arpeggios are developing — time to dig into the deeper stuff.</div>
@@ -597,19 +566,6 @@
                         </div>
 
                         <div class="question">
-                            <label class="question-text">Diminished arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="da_0" name="dim_arps" value="0"><label for="da_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="da_1" name="dim_arps" value="1"><label for="da_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="da_2" name="dim_arps" value="2"><label for="da_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="da_3" name="dim_arps" value="3"><label for="da_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="da_4" name="dim_arps" value="4"><label for="da_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="da_5" name="dim_arps" value="5"><label for="da_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="da_6" name="dim_arps" value="6"><label for="da_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
                             <label class="question-text">Harmonised major scale / diatonic chord sequences — how would you rate yourself?</label>
                             <div class="scale-options">
                                 <div class="scale-option"><input type="radio" id="hms_0" name="harmonized_major_scale" value="0"><label for="hms_0">0</label></div>
@@ -647,22 +603,9 @@
                                 <div class="scale-option"><input type="radio" id="mod_6" name="modes" value="6"><label for="mod_6">6</label></div>
                             </div>
                         </div>
-
-                        <div class="question">
-                            <label class="question-text">Slash chords / chord inversions — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="sc_0" name="slash_chords" value="0"><label for="sc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="sc_1" name="slash_chords" value="1"><label for="sc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="sc_2" name="slash_chords" value="2"><label for="sc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="sc_3" name="slash_chords" value="3"><label for="sc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="sc_4" name="slash_chords" value="4"><label for="sc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="sc_5" name="slash_chords" value="5"><label for="sc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="sc_6" name="slash_chords" value="6"><label for="sc_6">6</label></div>
-                            </div>
-                        </div>
                     </div>
 
-                    <!-- SECTION 6: NAVIGATION — always visible -->
+                    <!-- NAVIGATION — always visible -->
                     <div class="form-section" id="section-navigation">
                         <div class="section-title">Navigation</div>
 
@@ -693,7 +636,7 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 7: TECHNIQUE — unlocks when minor_pentatonic OR major_pentatonic >= 4 -->
+                    <!-- TECHNIQUE — unlocks when minor_pentatonic OR major_pentatonic >= 4 -->
                     <div class="form-section hidden" id="section-technique">
                         <div class="section-title">Technique & Control</div>
                         <div class="unlock-notice">Unlocked because your pentatonics are solid — these questions are about refining how you play, not just what you know.</div>
@@ -738,19 +681,6 @@
                         </div>
 
                         <div class="question">
-                            <label class="question-text">Bending phrasing / musicality — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="bp_0" name="bending_phrasing" value="0"><label for="bp_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="bp_1" name="bending_phrasing" value="1"><label for="bp_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="bp_2" name="bending_phrasing" value="2"><label for="bp_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="bp_3" name="bending_phrasing" value="3"><label for="bp_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="bp_4" name="bending_phrasing" value="4"><label for="bp_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="bp_5" name="bending_phrasing" value="5"><label for="bp_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="bp_6" name="bending_phrasing" value="6"><label for="bp_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
                             <label class="question-text">Vibrato control & consistency — how would you rate yourself?</label>
                             <div class="scale-options">
                                 <div class="scale-option"><input type="radio" id="vc_0" name="vibrato_control" value="0"><label for="vc_0">0</label></div>
@@ -773,19 +703,6 @@
                                 <div class="scale-option"><input type="radio" id="vm_4" name="vibrato_musicality" value="4"><label for="vm_4">4</label></div>
                                 <div class="scale-option"><input type="radio" id="vm_5" name="vibrato_musicality" value="5"><label for="vm_5">5</label></div>
                                 <div class="scale-option"><input type="radio" id="vm_6" name="vibrato_musicality" value="6"><label for="vm_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Accuracy on target notes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="acc_0" name="accuracy" value="0"><label for="acc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="acc_1" name="accuracy" value="1"><label for="acc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="acc_2" name="accuracy" value="2"><label for="acc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="acc_3" name="accuracy" value="3"><label for="acc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="acc_4" name="accuracy" value="4"><label for="acc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="acc_5" name="accuracy" value="5"><label for="acc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="acc_6" name="accuracy" value="6"><label for="acc_6">6</label></div>
                             </div>
                         </div>
 
@@ -819,53 +736,46 @@
                     <!-- STRUGGLES — always visible -->
                     <div class="form-section" id="section-struggles">
                         <div class="section-title">What Do You Struggle With?</div>
-
                         <div class="question">
                             <label class="question-text">Select all that apply:</label>
                             <div class="weakness-checkboxes">
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="struggle_timing" name="struggles" value="timing">
-                                    <label for="struggle_timing">Timing / staying in time</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="struggle_phrasing" name="struggles" value="phrasing">
-                                    <label for="struggle_phrasing">Phrasing / musicality</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="struggle_accuracy" name="struggles" value="accuracy">
-                                    <label for="struggle_accuracy">Accuracy / hitting notes</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="struggle_transitions" name="struggles" value="transitions">
-                                    <label for="struggle_transitions">Transitions between positions</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="struggle_bending" name="struggles" value="bending">
-                                    <label for="struggle_bending">Bending</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="struggle_chord_changes" name="struggles" value="chord_changes">
-                                    <label for="struggle_chord_changes">Chord changes</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="struggle_vibrato" name="struggles" value="vibrato">
-                                    <label for="struggle_vibrato">Vibrato control</label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="struggle_navigation" name="struggles" value="navigation">
-                                    <label for="struggle_navigation">Finding my way around the neck</label>
-                                </div>
+                                <div class="checkbox-item"><input type="checkbox" id="struggle_timing" name="struggles" value="timing"><label for="struggle_timing">Timing / staying in time</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="struggle_phrasing" name="struggles" value="phrasing"><label for="struggle_phrasing">Phrasing / musicality</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="struggle_accuracy" name="struggles" value="accuracy"><label for="struggle_accuracy">Accuracy / hitting notes</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="struggle_transitions" name="struggles" value="transitions"><label for="struggle_transitions">Transitions between positions</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="struggle_bending" name="struggles" value="bending"><label for="struggle_bending">Bending</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="struggle_chord_changes" name="struggles" value="chord_changes"><label for="struggle_chord_changes">Chord changes</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="struggle_vibrato" name="struggles" value="vibrato"><label for="struggle_vibrato">Vibrato control</label></div>
+                                <div class="checkbox-item"><input type="checkbox" id="struggle_navigation" name="struggles" value="navigation"><label for="struggle_navigation">Finding my way around the neck</label></div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="submit-btn">Generate My Practice Plan</button>
+                    <!-- EMAIL GATE — sits between questions and submit -->
+                    <div class="email-gate">
+                        <h3>Where should we send your plan?</h3>
+                        <p>Enter your details below and we'll email you a copy of your personalised practice plan so you can refer back to it anytime.</p>
+                        <div class="email-gate-fields">
+                            <div class="field-group">
+                                <label for="userName">First name</label>
+                                <input type="text" id="userName" name="userName" placeholder="Your first name" required>
+                            </div>
+                            <div class="field-group">
+                                <label for="userEmail">Email address</label>
+                                <input type="email" id="userEmail" name="userEmail" placeholder="your@email.com" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Generate My Practice Plan →</button>
+                    <p class="privacy-note">Your details are kept private and never shared.</p>
+
                 </form>
             </div>
 
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Generating your practice plan...</p>
+                <p>Building your personalised practice plan...</p>
             </div>
 
             <div class="results" id="results"></div>
@@ -873,69 +783,31 @@
     </div>
 
     <script>
-        // ── Branching logic ──────────────────────────────────────────────
-        // Thresholds
-        const THRESHOLD = {
-            triads:     { field: 'major_scale',     min: 3 },
-            seventhChords: { field: 'bar_chords',   min: 2 },
-            arpeggios:  { fields: ['major_triads', 'minor_triads'], min: 2 },  // either
-            advanced:   { fields: ['major_arps', 'minor_arps'],     min: 2 },  // either
-            technique:  { fields: ['minor_pentatonic', 'major_pentatonic'], min: 4 } // either
-        };
-
-        // Track current values
+        // — Branching logic —
         const scores = {};
 
-        function getScore(fieldName) {
-            return scores[fieldName] || 0;
-        }
+        function getScore(fieldName) { return scores[fieldName] || 0; }
 
-        function showSection(id) {
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function hideSection(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
+        function showSection(id) { document.getElementById(id).classList.remove('hidden'); }
+        function hideSection(id) { document.getElementById(id).classList.add('hidden'); }
 
         function updateBranching() {
-            // Triads: major_scale >= 3
-            if (getScore('major_scale') >= 3) {
-                showSection('section-triads');
-            } else {
-                hideSection('section-triads');
-            }
+            if (getScore('major_scale') >= 3) showSection('section-triads');
+            else hideSection('section-triads');
 
-            // 7th chords: bar_chords >= 2
-            if (getScore('bar_chords') >= 2) {
-                showSection('section-seventh-chords');
-            } else {
-                hideSection('section-seventh-chords');
-            }
+            if (getScore('bar_chords') >= 2) showSection('section-seventh-chords');
+            else hideSection('section-seventh-chords');
 
-            // Arpeggios: major_triads OR minor_triads >= 2
-            if (getScore('major_triads') >= 2 || getScore('minor_triads') >= 2) {
-                showSection('section-arpeggios');
-            } else {
-                hideSection('section-arpeggios');
-            }
+            if (getScore('major_triads') >= 2 || getScore('minor_triads') >= 2) showSection('section-arpeggios');
+            else hideSection('section-arpeggios');
 
-            // Advanced: major_arps OR minor_arps >= 2
-            if (getScore('major_arps') >= 2 || getScore('minor_arps') >= 2) {
-                showSection('section-advanced');
-            } else {
-                hideSection('section-advanced');
-            }
+            if (getScore('major_arps') >= 2 || getScore('minor_arps') >= 2) showSection('section-advanced');
+            else hideSection('section-advanced');
 
-            // Technique: minor_pentatonic OR major_pentatonic >= 4
-            if (getScore('minor_pentatonic') >= 4 || getScore('major_pentatonic') >= 4) {
-                showSection('section-technique');
-            } else {
-                hideSection('section-technique');
-            }
+            if (getScore('minor_pentatonic') >= 4 || getScore('major_pentatonic') >= 4) showSection('section-technique');
+            else hideSection('section-technique');
         }
 
-        // Listen to all radio changes
         document.getElementById('assessmentForm').addEventListener('change', (e) => {
             if (e.target.type === 'radio') {
                 scores[e.target.name] = parseInt(e.target.value);
@@ -943,7 +815,7 @@
             }
         });
 
-        // ── Form submission ──────────────────────────────────────────────
+        // — Form submission —
         const API_BASE = window.location.origin;
         const form = document.getElementById('assessmentForm');
         const loading = document.getElementById('loading');
@@ -955,8 +827,19 @@
             e.preventDefault();
             errorDiv.classList.remove('active');
 
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+
+            if (!name || !email) {
+                errorDiv.textContent = 'Please enter your name and email to receive your plan.';
+                errorDiv.classList.add('active');
+                return;
+            }
+
             const formData = new FormData(form);
             const data = {
+                name: name,
+                email: email,
                 scales: {},
                 triads: {},
                 chords: {},
@@ -969,18 +852,18 @@
             for (const [key, value] of formData.entries()) {
                 if (key === 'struggles') {
                     data.struggles.push(value);
-                } else if (['minor_pentatonic', 'major_pentatonic', 'major_scale', 'modes'].includes(key)) {
+                } else if (key === 'userName' || key === 'userEmail') {
+                    // already captured above
+                } else if (['minor_pentatonic', 'major_pentatonic', 'major_scale', 'bar_chords', 'modes'].includes(key)) {
                     data.scales[key] = parseInt(value);
                 } else if (['major_triads', 'minor_triads', 'diminished_triads'].includes(key)) {
                     data.triads[key] = parseInt(value);
-                } else if (['major_chords', 'minor_chords', 'maj7_chords', 'min7_chords', 'dom7_chords', 'dim_chords', 'harmonized_major_scale', 'chord_targeting', 'slash_chords'].includes(key)) {
+                } else if (['major_chords', 'minor_chords', 'maj7_chords', 'min7_chords', 'dom7_chords', 'harmonized_major_scale', 'chord_targeting', 'slash_chords'].includes(key)) {
                     data.chords[key] = parseInt(value);
                 } else if (['major_arps', 'minor_arps', 'maj7_arps', 'min7_arps', 'dom7_arps', 'dim_arps'].includes(key)) {
                     data.arpeggios[key] = parseInt(value);
                 } else if (['root_notes', 'same_note'].includes(key)) {
                     data.navigation[key] = parseInt(value);
-                } else if (['bar_chords'].includes(key)) {
-                    data.scales[key] = parseInt(value);
                 } else {
                     data.technique[key] = parseInt(value);
                 }
@@ -1001,13 +884,14 @@
 
                 const result = await response.json();
                 loading.classList.remove('active');
-                results.innerHTML = result.plan;
+                results.innerHTML = `<p style="color:#2d5a3d; font-size:13px; margin-bottom:20px;">✓ Your plan has been sent to <strong>${email}</strong> — check your inbox.</p>` + result.plan;
                 results.classList.add('active');
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             } catch (error) {
                 console.error('Error:', error);
                 loading.classList.remove('active');
-                errorDiv.textContent = `Error generating plan: ${error.message}`;
+                errorDiv.textContent = `Something went wrong: ${error.message}`;
                 errorDiv.classList.add('active');
                 formWrapper.classList.remove('hidden');
             }
