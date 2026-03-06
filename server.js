@@ -30,6 +30,7 @@ async function saveLead(name, email) {
       email: email,
       firstName: firstName,
       lastName: lastName,
+      unsubscribed: false,
       audienceId: RESEND_AUDIENCE_ID,
     });
   } catch (err) {
