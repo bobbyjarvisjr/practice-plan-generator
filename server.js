@@ -20,17 +20,21 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const MASTERCLASS_LIBRARY_URL = 'https://www.bobbyjarvisjr.com/collections/all';
 const FROM_EMAIL = 'jarvis@bobbyjarvisjr.com';
-const LEADS_FILE = path.join('/tmp', 'leads.csv');
+const RESEND_AUDIENCE_ID = '75f227cf-4d8c-429a-8fcf-ee71f69c70fd';
 
-// Initialise CSV file if it doesn't exist
-if (!fs.existsSync(LEADS_FILE)) {
-  fs.writeFileSync(LEADS_FILE, 'Name,Email,Date\n');
-}
-
-function saveLead(name, email) {
-  const date = new Date().toISOString();
-  const line = `"${name}","${email}","${date}"\n`;
-  fs.appendFileSync(LEADS_FILE, line);
+async function saveLead(name, email) {
+  try {
+    const firstName = name.split(' ')[0];
+    const lastName = name.split(' ').slice(1).join(' ') || '';
+    await resend.contacts.create({
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      audienceId: RESEND_AUDIENCE_ID,
+    });
+  } catch (err) {
+    console.error('Failed to save contact to Resend:', err.message);
+  }
 }
 
 app.use(cors());
@@ -54,7 +58,6 @@ function buildCurriculumContext() {
     var belt = belts[i];
     var songs = getSongsByBelt(belt);
 
-    // Sort masterclass songs to the top within each belt
     songs.sort(function(a, b) {
       var aHas = a.existing_masterclass ? 1 : 0;
       var bHas = b.existing_masterclass ? 1 : 0;
@@ -104,8 +107,7 @@ function buildEmailHTML(name, planHTML) {
     </div>
   </div>
 </body>
-</html>
-  `.trim();
+</html>`.trim();
 }
 
 app.post('/api/generate-plan', async function(req, res) {
@@ -214,16 +216,16 @@ app.post('/api/generate-plan', async function(req, res) {
     var planText = message.content[0].type === 'text' ? message.content[0].text : '';
     planText = planText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
 
-    // Save lead to CSV
-    saveLead(name, email);
-
-    // Send email via Resend
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: email,
-      subject: 'Your Personalised Guitar Practice Plan',
-      html: buildEmailHTML(name, planText)
-    });
+    // Save to Resend Audience and send email in parallel
+    await Promise.all([
+      saveLead(name, email),
+      resend.emails.send({
+        from: FROM_EMAIL,
+        to: email,
+        subject: 'Your Personalised Guitar Practice Plan',
+        html: buildEmailHTML(name, planText)
+      })
+    ]);
 
     res.json({ plan: planText });
 
@@ -231,18 +233,6 @@ app.post('/api/generate-plan', async function(req, res) {
     console.error('Error:', error);
     res.status(500).json({ error: error.message || 'Failed to generate practice plan' });
   }
-});
-
-// Download leads CSV
-app.get('/leads', function(req, res) {
-  const token = req.query.token;
-  if (token !== process.env.LEADS_TOKEN) {
-    return res.status(401).send('Unauthorised');
-  }
-  if (!fs.existsSync(LEADS_FILE)) {
-    return res.status(404).send('No leads yet');
-  }
-  res.download(LEADS_FILE, 'leads.csv');
 });
 
 app.get('/health', function(req, res) {
