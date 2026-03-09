@@ -1,901 +1,250 @@
+const express = require('express');
+const cors = require('cors');
+const Anthropic = require('@anthropic-ai/sdk');
+const { Resend } = require('resend');
+const fs = require('fs');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+const curriculumData = JSON.parse(
+  fs.readFileSync(path.join(__dirname, 'curriculum_data.json'), 'utf-8')
+);
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+const MASTERCLASS_LIBRARY_URL = 'https://www.bobbyjarvisjr.com/collections/all';
+const FROM_EMAIL = 'jarvis@bobbyjarvisjr.com';
+const RESEND_AUDIENCE_ID = '75f227cf-4d8c-429a-8fcf-ee71f69c70fd';
+
+async function saveLead(name, email) {
+  try {
+    const firstName = name.split(' ')[0];
+    const lastName = name.split(' ').slice(1).join(' ') || '';
+    await resend.contacts.create({
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      unsubscribed: false,
+      audienceId: RESEND_AUDIENCE_ID,
+    });
+  } catch (err) {
+    console.error('Failed to save contact to Resend:', err.message);
+  }
+}
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
+
+function getSongsByBelt(belt) {
+  return curriculumData.filter(function(song) {
+    return song.difficulty_level.startsWith(belt);
+  });
+}
+
+function buildCurriculumContext() {
+  var belts = ['Foundation', 'Developing', 'Competent', 'Advanced', 'Master'];
+  var context = '# CURRICULUM DATABASE\n\n';
+  context += 'You have access to ' + curriculumData.length + ' songs organized by difficulty level.\n';
+  context += 'Difficulty uses a belt system: Foundation (easiest) to Developing to Competent to Advanced to Master (hardest).\n';
+  context += 'Each belt has sub-levels 1-3 (1=easier end, 3=harder end of that belt).\n\n';
+
+  for (var i = 0; i < belts.length; i++) {
+    var belt = belts[i];
+    var songs = getSongsByBelt(belt);
+
+    songs.sort(function(a, b) {
+      var aHas = a.existing_masterclass ? 1 : 0;
+      var bHas = b.existing_masterclass ? 1 : 0;
+      return bHas - aHas;
+    });
+
+    context += '## ' + belt + ' Level (' + songs.length + ' songs)\n';
+    songs.forEach(function(song) {
+      var songLine = '- **' + song.title + '** by ' + song.artist + ' [' + song.difficulty_level + ']';
+      if (song.skill_category) songLine += ' | Skill: ' + song.skill_category;
+      if (song.secondary_skill_category) songLine += ' + ' + song.secondary_skill_category;
+      if (song.section) songLine += ' | Section: ' + song.section;
+      if (song.existing_masterclass) songLine += ' | [HAS MASTERCLASS: ' + song.existing_masterclass + ']';
+      context += songLine + '\n';
+    });
+    context += '\n';
+  }
+  return context;
+}
+
+function buildEmailHTML(name, planHTML) {
+  return `
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guitar Practice Plan Generator</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #333;
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
-        }
-
-        .header h1 { font-size: 28px; margin-bottom: 10px; font-weight: 600; }
-        .header p { font-size: 14px; opacity: 0.9; }
-
-        .scale-legend {
-            background: #f0f7f2;
-            border: 1px solid #c8e6c9;
-            border-radius: 8px;
-            padding: 20px 25px;
-            margin: 30px 30px 0;
-        }
-
-        .scale-legend h3 {
-            font-size: 13px;
-            font-weight: 700;
-            color: #1a472a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .scale-legend-grid { display: grid; gap: 6px; }
-
-        .scale-legend-item {
-            display: flex;
-            gap: 10px;
-            font-size: 12px;
-            color: #444;
-            line-height: 1.4;
-        }
-
-        .scale-legend-num { font-weight: 700; color: #1a472a; min-width: 16px; }
-
-        .content { padding: 0 30px 40px; }
-
-        .form-section { margin-bottom: 40px; margin-top: 30px; }
-        .form-section.hidden { display: none; }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a472a;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #1a472a;
-            padding-bottom: 10px;
-        }
-
-        .question { margin-bottom: 28px; }
-
-        .question-text {
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 14px;
-            display: block;
-        }
-
-        .scale-options { display: flex; gap: 6px; flex-wrap: wrap; }
-
-        .scale-option { display: flex; flex-direction: column; align-items: center; }
-
-        .scale-option input[type="radio"] {
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-            accent-color: #1a472a;
-            margin-bottom: 4px;
-        }
-
-        .scale-option label {
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            padding: 6px 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            transition: all 0.2s;
-            min-width: 36px;
-            text-align: center;
-        }
-
-        .scale-option input[type="radio"]:checked + label {
-            background: #1a472a;
-            color: white;
-            border-color: #1a472a;
-        }
-
-        .weakness-checkboxes { display: grid; gap: 10px; }
-
-        .checkbox-item { display: flex; align-items: center; }
-
-        .checkbox-item input[type="checkbox"] {
-            margin-right: 10px;
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
-            accent-color: #1a472a;
-        }
-
-        .checkbox-item label { cursor: pointer; font-size: 13px; color: #555; }
-
-        /* Email capture section */
-        .email-gate {
-            background: #f0f7f2;
-            border: 2px solid #1a472a;
-            border-radius: 8px;
-            padding: 28px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-
-        .email-gate h3 {
-            font-size: 18px;
-            color: #1a472a;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .email-gate p {
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .email-gate-fields { display: grid; gap: 12px; }
-
-        .field-group { display: flex; flex-direction: column; gap: 6px; }
-
-        .field-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .field-group input {
-            padding: 10px 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-            width: 100%;
-        }
-
-        .field-group input:focus {
-            outline: none;
-            border-color: #1a472a;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
-            color: white;
-            border: none;
-            padding: 14px 40px;
-            font-size: 15px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 8px;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(26,71,42,0.3);
-        }
-
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .privacy-note {
-            font-size: 11px;
-            color: #888;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .loading { display: none; text-align: center; padding: 60px 20px; }
-        .loading.active { display: block; }
-
-        .spinner {
-            border: 3px solid #e0e0e0;
-            border-top: 3px solid #1a472a;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        .loading p { color: #555; font-size: 14px; }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .results { display: none; animation: fadeIn 0.5s ease-in; }
-        .results.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .results h2 { font-size: 20px; color: #1a472a; margin-bottom: 20px; margin-top: 30px; }
-        .results h3 { font-size: 16px; color: #2d5a3d; margin-top: 25px; margin-bottom: 15px; font-weight: 600; }
-        .results p, .results li { font-size: 13px; color: #555; margin-bottom: 10px; line-height: 1.7; }
-        .results ul { margin-left: 20px; margin-bottom: 15px; }
-        .results li { margin-bottom: 12px; }
-
-        .song-recommendation {
-            background: #f5f5f5;
-            padding: 15px;
-            border-left: 3px solid #1a472a;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-
-        .song-recommendation strong { color: #1a472a; }
-
-        .masterclass-link { color: #1a472a; font-weight: 600; }
-
-        .email-confirmation {
-            background: #f0f7f2;
-            border: 1px solid #c8e6c9;
-            border-radius: 6px;
-            padding: 14px 18px;
-            margin: 0 30px 20px;
-            font-size: 13px;
-            color: #2d5a3d;
-            display: none;
-        }
-
-        .email-confirmation.active { display: block; }
-
-        .error {
-            background: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .error.active { display: block; }
-
-        .form-wrapper { display: block; }
-        .form-wrapper.hidden { display: none; }
-
-        .unlock-notice {
-            font-size: 12px;
-            color: #888;
-            font-style: italic;
-            margin-bottom: 20px;
-            padding: 10px 14px;
-            background: #fafafa;
-            border-radius: 4px;
-            border-left: 3px solid #ddd;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Georgia, serif; background: #f5f5f0; margin: 0; padding: 20px; color: #2c2c2c; }
+    .container { max-width: 680px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 4px; }
+    h1 { color: #1a472a; font-size: 24px; margin-bottom: 4px; }
+    h2 { color: #1a472a; font-size: 20px; margin-top: 32px; }
+    h3 { color: #2c5f3f; font-size: 16px; margin-bottom: 4px; }
+    .song-recommendation { background: #f9f9f6; border-left: 3px solid #2c5f3f; padding: 16px 20px; margin: 12px 0; border-radius: 0 4px 4px 0; }
+    .masterclass-link { color: #2c5f3f; font-weight: bold; }
+    p { line-height: 1.7; }
+    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: #888; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Your Guitar Practice Plan</h1>
-            <p>Answer honestly and get a personalised plan based on where you're actually at</p>
-        </div>
-
-        <div class="scale-legend">
-            <h3>Rating Scale — be honest!</h3>
-            <div class="scale-legend-grid">
-                <div class="scale-legend-item"><span class="scale-legend-num">0</span><span>No knowledge at all</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">1</span><span>Started learning it but not using it yet</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">2</span><span>Just starting to implement it</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">3</span><span>Using it, but still thinking about it</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">4</span><span>Using it fairly confidently — occasionally get lost</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">5</span><span>Using it confidently and fluently</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">6</span><span>Mastered across the entire neck</span></div>
-            </div>
-        </div>
-
-        <div class="content">
-            <div class="error" id="error"></div>
-
-            <div class="form-wrapper" id="formWrapper">
-                <form id="assessmentForm">
-
-                    <!-- FOUNDATIONS -->
-                    <div class="form-section" id="section-foundations">
-                        <div class="section-title">Foundations</div>
-
-                        <div class="question">
-                            <label class="question-text">Minor pentatonic — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mp_0" name="minor_pentatonic" value="0"><label for="mp_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_1" name="minor_pentatonic" value="1"><label for="mp_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_2" name="minor_pentatonic" value="2"><label for="mp_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_3" name="minor_pentatonic" value="3"><label for="mp_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_4" name="minor_pentatonic" value="4"><label for="mp_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_5" name="minor_pentatonic" value="5"><label for="mp_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_6" name="minor_pentatonic" value="6"><label for="mp_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Major pentatonic — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mjp_0" name="major_pentatonic" value="0"><label for="mjp_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_1" name="major_pentatonic" value="1"><label for="mjp_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_2" name="major_pentatonic" value="2"><label for="mjp_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_3" name="major_pentatonic" value="3"><label for="mjp_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_4" name="major_pentatonic" value="4"><label for="mjp_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_5" name="major_pentatonic" value="5"><label for="mjp_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_6" name="major_pentatonic" value="6"><label for="mjp_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Major scale — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="ms_0" name="major_scale" value="0"><label for="ms_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_1" name="major_scale" value="1"><label for="ms_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_2" name="major_scale" value="2"><label for="ms_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_3" name="major_scale" value="3"><label for="ms_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_4" name="major_scale" value="4"><label for="ms_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_5" name="major_scale" value="5"><label for="ms_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_6" name="major_scale" value="6"><label for="ms_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Bar chords — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="bc_0" name="bar_chords" value="0"><label for="bc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_1" name="bar_chords" value="1"><label for="bc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_2" name="bar_chords" value="2"><label for="bc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_3" name="bar_chords" value="3"><label for="bc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_4" name="bar_chords" value="4"><label for="bc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_5" name="bar_chords" value="5"><label for="bc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_6" name="bar_chords" value="6"><label for="bc_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TRIADS — unlocks when major_scale >= 3 -->
-                    <div class="form-section hidden" id="section-triads">
-                        <div class="section-title">Triads</div>
-                        <div class="unlock-notice">Unlocked because your major scale is coming along — triads are the next logical step.</div>
-
-                        <div class="question">
-                            <label class="question-text">Major triads — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mjt_0" name="major_triads" value="0"><label for="mjt_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_1" name="major_triads" value="1"><label for="mjt_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_2" name="major_triads" value="2"><label for="mjt_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_3" name="major_triads" value="3"><label for="mjt_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_4" name="major_triads" value="4"><label for="mjt_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_5" name="major_triads" value="5"><label for="mjt_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_6" name="major_triads" value="6"><label for="mjt_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor triads — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mt_0" name="minor_triads" value="0"><label for="mt_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_1" name="minor_triads" value="1"><label for="mt_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_2" name="minor_triads" value="2"><label for="mt_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_3" name="minor_triads" value="3"><label for="mt_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_4" name="minor_triads" value="4"><label for="mt_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_5" name="minor_triads" value="5"><label for="mt_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_6" name="minor_triads" value="6"><label for="mt_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Diminished triads — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="dt_0" name="diminished_triads" value="0"><label for="dt_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_1" name="diminished_triads" value="1"><label for="dt_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_2" name="diminished_triads" value="2"><label for="dt_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_3" name="diminished_triads" value="3"><label for="dt_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_4" name="diminished_triads" value="4"><label for="dt_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_5" name="diminished_triads" value="5"><label for="dt_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_6" name="diminished_triads" value="6"><label for="dt_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 7TH CHORDS — unlocks when bar_chords >= 2 -->
-                    <div class="form-section hidden" id="section-seventh-chords">
-                        <div class="section-title">Chords & Harmony</div>
-                        <div class="unlock-notice">Unlocked because your bar chords are coming along — time to explore chord extensions.</div>
-
-                        <div class="question">
-                            <label class="question-text">Major chord shapes (CAGED) — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mjc_0" name="major_chords" value="0"><label for="mjc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_1" name="major_chords" value="1"><label for="mjc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_2" name="major_chords" value="2"><label for="mjc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_3" name="major_chords" value="3"><label for="mjc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_4" name="major_chords" value="4"><label for="mjc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_5" name="major_chords" value="5"><label for="mjc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_6" name="major_chords" value="6"><label for="mjc_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor chord shapes (CAGED) — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mc_0" name="minor_chords" value="0"><label for="mc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_1" name="minor_chords" value="1"><label for="mc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_2" name="minor_chords" value="2"><label for="mc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_3" name="minor_chords" value="3"><label for="mc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_4" name="minor_chords" value="4"><label for="mc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_5" name="minor_chords" value="5"><label for="mc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_6" name="minor_chords" value="6"><label for="mc_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Major 7 chord shapes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="m7c_0" name="maj7_chords" value="0"><label for="m7c_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_1" name="maj7_chords" value="1"><label for="m7c_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_2" name="maj7_chords" value="2"><label for="m7c_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_3" name="maj7_chords" value="3"><label for="m7c_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_4" name="maj7_chords" value="4"><label for="m7c_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_5" name="maj7_chords" value="5"><label for="m7c_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_6" name="maj7_chords" value="6"><label for="m7c_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor 7 chord shapes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mn7c_0" name="min7_chords" value="0"><label for="mn7c_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_1" name="min7_chords" value="1"><label for="mn7c_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_2" name="min7_chords" value="2"><label for="mn7c_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_3" name="min7_chords" value="3"><label for="mn7c_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_4" name="min7_chords" value="4"><label for="mn7c_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_5" name="min7_chords" value="5"><label for="mn7c_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_6" name="min7_chords" value="6"><label for="mn7c_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Dominant 7 chord shapes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="d7c_0" name="dom7_chords" value="0"><label for="d7c_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_1" name="dom7_chords" value="1"><label for="d7c_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_2" name="dom7_chords" value="2"><label for="d7c_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_3" name="dom7_chords" value="3"><label for="d7c_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_4" name="dom7_chords" value="4"><label for="d7c_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_5" name="dom7_chords" value="5"><label for="d7c_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_6" name="dom7_chords" value="6"><label for="d7c_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ARPEGGIOS — unlocks when major_triads OR minor_triads >= 2 -->
-                    <div class="form-section hidden" id="section-arpeggios">
-                        <div class="section-title">Arpeggios</div>
-                        <div class="unlock-notice">Unlocked because your triads are developing — arpeggios are the natural next step.</div>
-
-                        <div class="question">
-                            <label class="question-text">Major arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mja_0" name="major_arps" value="0"><label for="mja_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_1" name="major_arps" value="1"><label for="mja_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_2" name="major_arps" value="2"><label for="mja_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_3" name="major_arps" value="3"><label for="mja_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_4" name="major_arps" value="4"><label for="mja_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_5" name="major_arps" value="5"><label for="mja_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_6" name="major_arps" value="6"><label for="mja_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mna_0" name="minor_arps" value="0"><label for="mna_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_1" name="minor_arps" value="1"><label for="mna_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_2" name="minor_arps" value="2"><label for="mna_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_3" name="minor_arps" value="3"><label for="mna_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_4" name="minor_arps" value="4"><label for="mna_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_5" name="minor_arps" value="5"><label for="mna_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_6" name="minor_arps" value="6"><label for="mna_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ADVANCED — unlocks when major_arps OR minor_arps >= 2 -->
-                    <div class="form-section hidden" id="section-advanced">
-                        <div class="section-title">Advanced Harmony</div>
-                        <div class="unlock-notice">Unlocked because your arpeggios are developing — time to dig into the deeper stuff.</div>
-
-                        <div class="question">
-                            <label class="question-text">Major 7 arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="m7a_0" name="maj7_arps" value="0"><label for="m7a_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_1" name="maj7_arps" value="1"><label for="m7a_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_2" name="maj7_arps" value="2"><label for="m7a_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_3" name="maj7_arps" value="3"><label for="m7a_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_4" name="maj7_arps" value="4"><label for="m7a_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_5" name="maj7_arps" value="5"><label for="m7a_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_6" name="maj7_arps" value="6"><label for="m7a_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor 7 arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mn7a_0" name="min7_arps" value="0"><label for="mn7a_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_1" name="min7_arps" value="1"><label for="mn7a_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_2" name="min7_arps" value="2"><label for="mn7a_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_3" name="min7_arps" value="3"><label for="mn7a_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_4" name="min7_arps" value="4"><label for="mn7a_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_5" name="min7_arps" value="5"><label for="mn7a_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_6" name="min7_arps" value="6"><label for="mn7a_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Dominant 7 arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="d7a_0" name="dom7_arps" value="0"><label for="d7a_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_1" name="dom7_arps" value="1"><label for="d7a_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_2" name="dom7_arps" value="2"><label for="d7a_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_3" name="dom7_arps" value="3"><label for="d7a_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_4" name="dom7_arps" value="4"><label for="d7a_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_5" name="dom7_arps" value="5"><label for="d7a_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_6" name="dom7_arps" value="6"><label for="d7a_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Harmonised major scale / diatonic chord sequences — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="hms_0" name="harmonized_major_scale" value="0"><label for="hms_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_1" name="harmonized_major_scale" value="1"><label for="hms_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_2" name="harmonized_major_scale" value="2"><label for="hms_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_3" name="harmonized_major_scale" value="3"><label for="hms_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_4" name="harmonized_major_scale" value="4"><label for="hms_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_5" name="harmonized_major_scale" value="5"><label for="hms_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_6" name="harmonized_major_scale" value="6"><label for="hms_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Chord-tone targeting / chord navigation — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="ct_0" name="chord_targeting" value="0"><label for="ct_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_1" name="chord_targeting" value="1"><label for="ct_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_2" name="chord_targeting" value="2"><label for="ct_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_3" name="chord_targeting" value="3"><label for="ct_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_4" name="chord_targeting" value="4"><label for="ct_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_5" name="chord_targeting" value="5"><label for="ct_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_6" name="chord_targeting" value="6"><label for="ct_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Modes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mod_0" name="modes" value="0"><label for="mod_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_1" name="modes" value="1"><label for="mod_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_2" name="modes" value="2"><label for="mod_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_3" name="modes" value="3"><label for="mod_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_4" name="modes" value="4"><label for="mod_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_5" name="modes" value="5"><label for="mod_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_6" name="modes" value="6"><label for="mod_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NAVIGATION — always visible -->
-                    <div class="form-section" id="section-navigation">
-                        <div class="section-title">Navigation</div>
-
-                        <div class="question">
-                            <label class="question-text">Finding root notes on the neck — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="rn_0" name="root_notes" value="0"><label for="rn_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_1" name="root_notes" value="1"><label for="rn_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_2" name="root_notes" value="2"><label for="rn_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_3" name="root_notes" value="3"><label for="rn_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_4" name="root_notes" value="4"><label for="rn_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_5" name="root_notes" value="5"><label for="rn_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_6" name="root_notes" value="6"><label for="rn_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Finding the same note across different strings and positions — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="sn_0" name="same_note" value="0"><label for="sn_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_1" name="same_note" value="1"><label for="sn_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_2" name="same_note" value="2"><label for="sn_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_3" name="same_note" value="3"><label for="sn_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_4" name="same_note" value="4"><label for="sn_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_5" name="same_note" value="5"><label for="sn_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_6" name="same_note" value="6"><label for="sn_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TECHNIQUE — unlocks when minor_pentatonic OR major_pentatonic >= 4 -->
-                    <div class="form-section hidden" id="section-technique">
-                        <div class="section-title">Technique & Control</div>
-                        <div class="unlock-notice">Unlocked because your pentatonics are solid — these questions are about refining how you play, not just what you know.</div>
-
-                        <div class="question">
-                            <label class="question-text">Timing / rhythm accuracy — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="tim_0" name="timing" value="0"><label for="tim_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_1" name="timing" value="1"><label for="tim_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_2" name="timing" value="2"><label for="tim_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_3" name="timing" value="3"><label for="tim_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_4" name="timing" value="4"><label for="tim_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_5" name="timing" value="5"><label for="tim_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_6" name="timing" value="6"><label for="tim_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Pocket / groove feel — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="poc_0" name="pocket" value="0"><label for="poc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_1" name="pocket" value="1"><label for="poc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_2" name="pocket" value="2"><label for="poc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_3" name="pocket" value="3"><label for="poc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_4" name="pocket" value="4"><label for="poc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_5" name="pocket" value="5"><label for="poc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_6" name="pocket" value="6"><label for="poc_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Bending accuracy & control — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="ba_0" name="bending_accuracy" value="0"><label for="ba_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_1" name="bending_accuracy" value="1"><label for="ba_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_2" name="bending_accuracy" value="2"><label for="ba_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_3" name="bending_accuracy" value="3"><label for="ba_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_4" name="bending_accuracy" value="4"><label for="ba_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_5" name="bending_accuracy" value="5"><label for="ba_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_6" name="bending_accuracy" value="6"><label for="ba_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Vibrato control & consistency — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="vc_0" name="vibrato_control" value="0"><label for="vc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_1" name="vibrato_control" value="1"><label for="vc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_2" name="vibrato_control" value="2"><label for="vc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_3" name="vibrato_control" value="3"><label for="vc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_4" name="vibrato_control" value="4"><label for="vc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_5" name="vibrato_control" value="5"><label for="vc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_6" name="vibrato_control" value="6"><label for="vc_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Vibrato musicality / phrasing — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="vm_0" name="vibrato_musicality" value="0"><label for="vm_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_1" name="vibrato_musicality" value="1"><label for="vm_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_2" name="vibrato_musicality" value="2"><label for="vm_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_3" name="vibrato_musicality" value="3"><label for="vm_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_4" name="vibrato_musicality" value="4"><label for="vm_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_5" name="vibrato_musicality" value="5"><label for="vm_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_6" name="vibrato_musicality" value="6"><label for="vm_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Picking technique / hand positioning — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="pic_0" name="picking" value="0"><label for="pic_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_1" name="picking" value="1"><label for="pic_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_2" name="picking" value="2"><label for="pic_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_3" name="picking" value="3"><label for="pic_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_4" name="picking" value="4"><label for="pic_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_5" name="picking" value="5"><label for="pic_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_6" name="picking" value="6"><label for="pic_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Muting / noise control — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mut_0" name="muting" value="0"><label for="mut_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_1" name="muting" value="1"><label for="mut_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_2" name="muting" value="2"><label for="mut_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_3" name="muting" value="3"><label for="mut_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_4" name="muting" value="4"><label for="mut_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_5" name="muting" value="5"><label for="mut_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_6" name="muting" value="6"><label for="mut_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- STRUGGLES — always visible -->
-                    <div class="form-section" id="section-struggles">
-                        <div class="section-title">What Do You Struggle With?</div>
-                        <div class="question">
-                            <label class="question-text">Select all that apply:</label>
-                            <div class="weakness-checkboxes">
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_timing" name="struggles" value="timing"><label for="struggle_timing">Timing / staying in time</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_phrasing" name="struggles" value="phrasing"><label for="struggle_phrasing">Phrasing / musicality</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_accuracy" name="struggles" value="accuracy"><label for="struggle_accuracy">Accuracy / hitting notes</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_transitions" name="struggles" value="transitions"><label for="struggle_transitions">Transitions between positions</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_bending" name="struggles" value="bending"><label for="struggle_bending">Bending</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_chord_changes" name="struggles" value="chord_changes"><label for="struggle_chord_changes">Chord changes</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_vibrato" name="struggles" value="vibrato"><label for="struggle_vibrato">Vibrato control</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_navigation" name="struggles" value="navigation"><label for="struggle_navigation">Finding my way around the neck</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- EMAIL GATE — sits between questions and submit -->
-                    <div class="email-gate">
-                        <h3>Where should we send your plan?</h3>
-                        <p>Enter your details below and we'll email you a copy of your personalised practice plan so you can refer back to it anytime.</p>
-                        <div class="email-gate-fields">
-                            <div class="field-group">
-                                <label for="userName">First name</label>
-                                <input type="text" id="userName" name="userName" placeholder="Your first name" required>
-                            </div>
-                            <div class="field-group">
-                                <label for="userEmail">Email address</label>
-                                <input type="email" id="userEmail" name="userEmail" placeholder="your@email.com" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="submit-btn" id="submitBtn">Generate My Practice Plan →</button>
-                    <p class="privacy-note">By submitting this form you agree to receive occasional emails from Bobby Jarvis Jr including guitar tips, masterclass updates, and practice resources. You can unsubscribe at any time.</p>
-
-                </form>
-            </div>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Building your personalised practice plan...</p>
-            </div>
-
-            <div class="results" id="results"></div>
-        </div>
+  <div class="container">
+    <h1>Your Guitar Practice Plan</h1>
+    <p>Hey ${name}, here's your personalised practice plan. Save this email — it's yours to refer back to whenever you need it.</p>
+    ${planHTML}
+    <div class="footer">
+      <p>Questions? Head to <a href="https://www.bobbyjarvisjr.com" style="color:#2c5f3f;">bobbyjarvisjr.com</a> to explore the full masterclass library.</p>
     </div>
-
-    <script>
-        // — Branching logic —
-        const scores = {};
-
-        function getScore(fieldName) { return scores[fieldName] || 0; }
-
-        function showSection(id) { document.getElementById(id).classList.remove('hidden'); }
-        function hideSection(id) { document.getElementById(id).classList.add('hidden'); }
-
-        function updateBranching() {
-            if (getScore('major_scale') >= 3) showSection('section-triads');
-            else hideSection('section-triads');
-
-            if (getScore('bar_chords') >= 2) showSection('section-seventh-chords');
-            else hideSection('section-seventh-chords');
-
-            if (getScore('major_triads') >= 2 || getScore('minor_triads') >= 2) showSection('section-arpeggios');
-            else hideSection('section-arpeggios');
-
-            if (getScore('major_arps') >= 2 || getScore('minor_arps') >= 2) showSection('section-advanced');
-            else hideSection('section-advanced');
-
-            if (getScore('minor_pentatonic') >= 4 || getScore('major_pentatonic') >= 4) showSection('section-technique');
-            else hideSection('section-technique');
-        }
-
-        document.getElementById('assessmentForm').addEventListener('change', (e) => {
-            if (e.target.type === 'radio') {
-                scores[e.target.name] = parseInt(e.target.value);
-                updateBranching();
-            }
-        });
-
-        // — Form submission —
-        const API_BASE = window.location.origin;
-        const form = document.getElementById('assessmentForm');
-        const loading = document.getElementById('loading');
-        const results = document.getElementById('results');
-        const errorDiv = document.getElementById('error');
-        const formWrapper = document.getElementById('formWrapper');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorDiv.classList.remove('active');
-
-            const name = document.getElementById('userName').value.trim();
-            const email = document.getElementById('userEmail').value.trim();
-
-            if (!name || !email) {
-                errorDiv.textContent = 'Please enter your name and email to receive your plan.';
-                errorDiv.classList.add('active');
-                return;
-            }
-
-            const formData = new FormData(form);
-            const data = {
-                name: name,
-                email: email,
-                scales: {},
-                triads: {},
-                chords: {},
-                arpeggios: {},
-                navigation: {},
-                technique: {},
-                struggles: []
-            };
-
-            for (const [key, value] of formData.entries()) {
-                if (key === 'struggles') {
-                    data.struggles.push(value);
-                } else if (key === 'userName' || key === 'userEmail') {
-                    // already captured above
-                } else if (['minor_pentatonic', 'major_pentatonic', 'major_scale', 'bar_chords', 'modes'].includes(key)) {
-                    data.scales[key] = parseInt(value);
-                } else if (['major_triads', 'minor_triads', 'diminished_triads'].includes(key)) {
-                    data.triads[key] = parseInt(value);
-                } else if (['major_chords', 'minor_chords', 'maj7_chords', 'min7_chords', 'dom7_chords', 'harmonized_major_scale', 'chord_targeting', 'slash_chords'].includes(key)) {
-                    data.chords[key] = parseInt(value);
-                } else if (['major_arps', 'minor_arps', 'maj7_arps', 'min7_arps', 'dom7_arps', 'dim_arps'].includes(key)) {
-                    data.arpeggios[key] = parseInt(value);
-                } else if (['root_notes', 'same_note'].includes(key)) {
-                    data.navigation[key] = parseInt(value);
-                } else {
-                    data.technique[key] = parseInt(value);
-                }
-            }
-
-            formWrapper.classList.add('hidden');
-            loading.classList.add('active');
-            results.classList.remove('active');
-
-            try {
-                const response = await fetch(`${API_BASE}/api/generate-plan`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) throw new Error(`API error: ${response.statusText}`);
-
-                const result = await response.json();
-                loading.classList.remove('active');
-                results.innerHTML = `<p style="color:#2d5a3d; font-size:13px; margin-bottom:20px;">✓ Your plan has been sent to <strong>${email}</strong> — check your inbox.</p>` + result.plan;
-                results.classList.add('active');
-                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            } catch (error) {
-                console.error('Error:', error);
-                loading.classList.remove('active');
-                errorDiv.textContent = `Something went wrong: ${error.message}`;
-                errorDiv.classList.add('active');
-                formWrapper.classList.remove('hidden');
-            }
-        });
-    </script>
+  </div>
 </body>
-</html>
+</html>`.trim();
+}
+
+app.post('/api/generate-plan', async function(req, res) {
+  try {
+    var body = req.body;
+    var name = (body.name || '').trim();
+    var email = (body.email || '').trim();
+
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required' });
+    }
+
+    var assessment = {
+      scales: body.scales || {},
+      triads: body.triads || {},
+      chords: body.chords || {},
+      arpeggios: body.arpeggios || {},
+      navigation: body.navigation || {},
+      technique: body.technique || {},
+      struggles: body.struggles || []
+    };
+
+    var allScores = Object.assign({},
+      assessment.scales,
+      assessment.triads,
+      assessment.chords,
+      assessment.arpeggios,
+      assessment.navigation,
+      assessment.technique
+    );
+
+    var scoreValues = Object.values(allScores);
+    var avgScore = scoreValues.length > 0
+      ? scoreValues.reduce(function(a, b) { return a + b; }, 0) / scoreValues.length
+      : 0;
+
+    var weakAreas = Object.entries(allScores)
+      .filter(function(entry) { return entry[1] <= 2; })
+      .map(function(entry) { return entry[0]; });
+
+    var systemPrompt = 'You are J, an experienced British guitar teacher creating a personalised practice plan.\n\n' +
+
+      'RATING SCALE (0-6):\n' +
+      '0 = No knowledge at all\n' +
+      '1 = Started learning but not using it yet\n' +
+      '2 = Just starting to implement it\n' +
+      '3 = Using it but still thinking about it\n' +
+      '4 = Using it fairly confidently, occasionally get lost\n' +
+      '5 = Using it confidently and fluently\n' +
+      '6 = Mastered across the entire neck\n\n' +
+
+      'PART 1 - ASSESSMENT (3-4 paragraphs):\n' +
+      '- Honest overview of where they are based on their scores\n' +
+      '- Identify their 2-3 most important weak areas and why they matter\n' +
+      '- Be direct and specific, not generic\n\n' +
+
+      'PART 2 - SONG RECOMMENDATIONS (exactly 5-7 songs):\n' +
+      '- Use the Skill: field in the curriculum to match songs to the weak areas you identified in Part 1\n' +
+      '- If triads are weak, pick songs where Skill: Triads\n' +
+      '- If major pentatonic is weak, pick songs where Skill: Major Pentatonic\n' +
+      '- The Skill: field is your PRIMARY filter. Difficulty level is secondary.\n' +
+      '- Every song must directly address a weak area you named in your assessment\n' +
+      '- Do not jump too far ahead on difficulty\n' +
+      '- Order from most accessible to most challenging\n\n' +
+
+      'MASTERCLASS RULES:\n' +
+      '- Prioritise songs marked [HAS MASTERCLASS] where they match the weak areas\n' +
+      '- When a song has [HAS MASTERCLASS: X], say: "This is covered in my <strong>X</strong> masterclass." and add: <a href="' + MASTERCLASS_LIBRARY_URL + '" target="_blank" class="masterclass-link">View Masterclass Library</a>\n' +
+      '- ONLY use the exact masterclass name from the [HAS MASTERCLASS: X] tag — never invent or guess a masterclass name\n' +
+      '- If a song has no [HAS MASTERCLASS] tag, do not mention a masterclass at all\n\n' +
+
+      'SONG TITLE FORMAT: Song Title — Artist (no difficulty label in the title)\n\n' +
+
+      'FORMAT RULES:\n' +
+      '- Recommend EXACTLY 5-7 songs. Not more, not less.\n' +
+      '- Tone: direct, honest, encouraging. British. No waffle.\n' +
+      '- Clean HTML only: <h2>, <h3>, <p>, <ul>, <li> tags\n' +
+      '- Wrap each song in <div class="song-recommendation"> tags\n' +
+      '- Song title in <strong> tags';
+
+    var curriculumContext = buildCurriculumContext();
+
+    var assessmentSummary =
+      'ASSESSMENT RESULTS:\n' +
+      '- Average technical level: ' + (avgScore / 6 * 100).toFixed(0) + '%\n' +
+      '- Main weak areas (scored 0-2): ' + (weakAreas.length > 0 ? weakAreas.slice(0, 5).join(', ') : 'Overall development needed') + '\n' +
+      '- Self-reported struggles: ' + (assessment.struggles.length > 0 ? assessment.struggles.join(', ') : 'None specified') + '\n\n' +
+      'Detailed scores (0-6 scale):\n' +
+      JSON.stringify(assessment, null, 2) + '\n\n' +
+      curriculumContext + '\n\n' +
+      'TASK:\n' +
+      '1. Write the assessment identifying 2-3 key weak areas\n' +
+      '2. Recommend exactly 5-7 songs - use the Skill: field to match songs directly to the weak areas you named\n' +
+      '3. Every song must justify itself against a specific weakness from your assessment\n' +
+      '4. For any song with [HAS MASTERCLASS: X], use that exact name and include the library link\n' +
+      '5. Never invent a masterclass name\n\n' +
+      'Format as clean HTML. Use <h2>, <h3>, <p>, <ul>, <li> tags. Wrap each song in <div class="song-recommendation"> tags.';
+
+    var message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 2500,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: assessmentSummary }]
+    });
+
+    var planText = message.content[0].type === 'text' ? message.content[0].text : '';
+    planText = planText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
+
+    // Save to Resend Audience and send email in parallel
+    await Promise.all([
+      saveLead(name, email),
+      resend.emails.send({
+        from: FROM_EMAIL,
+        to: email,
+        subject: 'Your Personalised Guitar Practice Plan',
+        html: buildEmailHTML(name, planText)
+      })
+    ]);
+
+    res.json({ plan: planText });
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: error.message || 'Failed to generate practice plan' });
+  }
+});
+
+app.get('/health', function(req, res) {
+  res.json({ status: 'ok' });
+});
+
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.listen(PORT, function() {
+  console.log('Server running on port ' + PORT);
+  console.log('Curriculum loaded: ' + curriculumData.length + ' songs');
+});
