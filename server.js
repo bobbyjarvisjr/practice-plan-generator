@@ -94,6 +94,8 @@ function buildEmailHTML(name, planHTML) {
     h3 { color: #2c5f3f; font-size: 16px; margin-bottom: 4px; }
     .song-recommendation { background: #f9f9f6; border-left: 3px solid #2c5f3f; padding: 16px 20px; margin: 12px 0; border-radius: 0 4px 4px 0; }
     .masterclass-link { color: #2c5f3f; font-weight: bold; }
+    .promo-box { background: #f0f7f2; border: 2px solid #1a472a; border-radius: 6px; padding: 20px 24px; margin: 24px 0; }
+    .promo-box p { margin: 0; font-size: 14px; line-height: 1.7; }
     p { line-height: 1.7; }
     .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: #888; }
   </style>
@@ -101,8 +103,17 @@ function buildEmailHTML(name, planHTML) {
 <body>
   <div class="container">
     <h1>Your Guitar Practice Plan</h1>
-    <p>Hey ${name}, here's your personalised practice plan. Save this email — it's yours to refer back to whenever you need it.</p>
+    <p>Hey ${name}, here's your personalised practice plan. If you need more help with what and how to practice, make sure you come along to my free live masterclass below — then crack on with the plan underneath.</p>
+
+    <div class="promo-box">
+      <p><strong>🎸 FREE Live Masterclass — What To Practice</strong><br>
+      March 28th &bull; 6pm UK / 1pm Eastern / 10am Pacific<br><br>
+      Make sure to register now as there are limited spaces.<br><br>
+      <a href="https://us06web.zoom.us/webinar/register/WN_dAd-o12YRrOIsVlJEitAfw" style="color:#1a472a;font-weight:bold;">👉 Register free here</a></p>
+    </div>
+
     ${planHTML}
+
     <div class="footer">
       <p>Questions? Head to <a href="https://www.bobbyjarvisjr.com" style="color:#2c5f3f;">bobbyjarvisjr.com</a> to explore the full masterclass library.</p>
     </div>
