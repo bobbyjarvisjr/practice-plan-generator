@@ -52,9 +52,39 @@ function getSongsByBelt(belt) {
   });
 }
 
+// The actual contents of the Complete Course Library, in course order.
+// This is the source of truth for course_section — NOT the song tags.
+// If the course changes, change this list.
+const COURSE_SECTIONS = [
+  'Breaking Out Of Box 1',
+  'CAGED Deep Dive',
+  'Major Pentatonic',
+  'Major Scale',
+  'Triads',
+  'Arpeggios',
+  'Extended Chords',
+  'How Music Works',
+  'Modes',
+  'Spread Triads',
+  '7th Arpeggios',
+  'Min Pentatonic add 9',
+  'Mixing Pentatonics',
+  'Something - The Beatles',
+  'Wind Cries Mary',
+  'Sultans Of Swing Solo 1',
+  'Bonus Lesson - Minor Scales'
+];
+
 function buildCurriculumContext() {
   var belts = ['Foundation', 'Developing', 'Competent', 'Advanced', 'Master'];
-  var context = '# CURRICULUM DATABASE\n\n';
+  var context = '# COURSE SECTIONS\n\n';
+  context += 'These are the 17 sections of the course, listed in the order they appear in it.\n';
+  context += 'This is the complete list. Never name a section that is not on it.\n';
+  context += 'The order is roughly progressive — earlier sections are more foundational.\n';
+  context += 'Note: song titles appearing here (Something, Wind Cries Mary, Sultans Of Swing) are\n';
+  context += 'song-study sections, not general skill sections. Only use them for advanced players.\n\n';
+  COURSE_SECTIONS.forEach(function (s, i) { context += (i + 1) + '. ' + s + '\n'; });
+  context += '\n# CURRICULUM DATABASE\n\n';
   context += 'You have access to ' + curriculumData.length + ' songs organized by difficulty level.\n';
   context += 'Difficulty uses an internal belt system: Foundation (easiest) to Developing to Competent to Advanced to Master (hardest).\n';
   context += 'Each belt has sub-levels 1-3 (1=easier end, 3=harder end of that belt).\n';
@@ -188,20 +218,37 @@ sequence_logic must name the actual reason. "These are in questionnaire order" i
 - what_this_looks_like: what they actually do at the guitar. Concrete. "Play the changes to X and name the root of each chord as it lands" not "practise root notes regularly". No timeframes, no minutes-per-day, no weekly schedules.
 - signal: how they know it's landed, checkable by them alone
 
+## SCOPE THE INSTRUCTION TO THEIR LEVEL
+This matters and it is easy to get wrong.
+If the relevant score is 0-2, the instruction is ONE thing done properly. One shape. One position. One progression. Not a system, not "all five shapes across the neck", not "every position". Someone at 1 who is told to learn the whole neck will not start.
+If the score is 3, the instruction is about making what they already know automatic — same material, less thinking.
+If the score is 4+, it is not a weak area and should not be a priority.
+
 ## SONGS
 One song per priority. Not a list.
 Pick on skill_category matching the priority. Difficulty at their level or one notch below — under-reaching is fine, over-reaching wastes the pick.
 why_this_song: what specifically this song makes them do. Not "great song for beginners".
 
-course_section: if the chosen song has [HAS MASTERCLASS: X], put X here verbatim. Otherwise null. Never invent one. It is a name, not a link.
+## COURSE_SECTION
+course_section belongs to the PRIORITY, not the song. The question is "does the course teach this skill", not "is this particular song taught in the course".
 
-At least one priority should carry a course_section where the assessment honestly supports it — this normally follows from picking songs that match the gaps. If it genuinely doesn't, leave them all null rather than forcing a bad song choice.
+Choose the section from the COURSE SECTIONS list at the top of the curriculum data that covers the material in this priority. Use the name verbatim. Never invent a name that is not on that list.
+
+The list is in course order and is roughly progressive. Match the section to the priority, and to where the player actually is:
+- Beginners and anyone weak on the neck, minor pentatonic, or chord shapes belong in the first two sections — "Breaking Out Of Box 1" and "CAGED Deep Dive". These are where the course starts and where a new player should start.
+- Do not send a beginner to a late section like "Mixing Pentatonics", "Modes" or "Spread Triads" because the words match. Match the level, not just the topic.
+- The song-study sections are for advanced players working on that specific piece.
+
+Most priorities should carry a section — the course covers the fundamentals, and a beginner working on root notes, barre chords or pentatonic is squarely covered by the opening sections.
+Use null only if nothing on the list genuinely covers the priority.
 
 ## COURSE_FIT
 The course is one product containing all of this material. Not separate purchases. Never imply they are buying several things.
 opening: connect the plan to the material — the sections they need are in there
-sections_named: only sections you named in course_section above
+sections_named: exactly the non-null section names you used above, no more and no fewer
 closing: one or two lines. No urgency, no discount, no pressure. If the plan is good this reads as obvious.
+
+If every course_section is null, sections_named must be empty AND opening/closing must not claim the course covers their plan. Say something honest and light instead — the plan stands on its own and the course is there when they want more.
 
 ## OUTPUT
 Return ONLY valid JSON matching this schema. No markdown fences, no preamble, no trailing commentary.
@@ -224,7 +271,8 @@ Return ONLY valid JSON matching this schema. No markdown fences, no preamble, no
       "unlocks": "string or null",
       "what_this_looks_like": "",
       "signal": "",
-      "song": { "title": "", "artist": "", "why_this_song": "", "course_section": "string or null" }
+      "course_section": "string or null — from the COURSE SECTIONS list, or null",
+      "song": { "title": "", "artist": "", "why_this_song": "" }
     }
   ],
   "course_fit": { "opening": "", "sections_named": [], "closing": "" }
