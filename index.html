@@ -1,901 +1,876 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guitar Practice Plan Generator</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Free Practice Pathway · Bobby Jarvis Jr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* dark — hero only */
+  --d-bg:#0a0908;
+  --d-raise:#161311;
+  --d-line:#2a2624;
+  --d-ink:#f2ede7;
+  --d-dim:#a49c94;
+  /* light — questionnaire */
+  --bg:#ffffff;
+  --raise:#faf9f8;
+  --line:#e4e0dc;
+  --line-soft:#f0edea;
+  --ink:#17140f;
+  --ink-dim:#5f574f;
+  --ink-faint:#9a938b;
+  --accent:#ff5a3c;
+  --accent-soft:#fff1ed;
+  --accent-line:#ffc9bc;
+  --display:'Bebas Neue',Impact,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --body:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--body);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background .5s ease;
+}
+/* dark mode applies ONLY while the hero is showing */
+body.hero-mode{background:var(--d-bg);color:var(--d-ink)}
+body.hero-mode::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 92% 60% at 50% -8%, rgba(255,90,60,.09), transparent 70%);
+}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #333;
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 20px;
-        }
+/* ---------- progress ---------- */
+.progress-rail{
+  position:fixed;top:0;left:0;right:0;height:3px;
+  background:var(--line-soft);z-index:50;
+}
+body.hero-mode .progress-rail{background:transparent}
+.progress-fill{
+  height:100%;width:0%;background:var(--accent);
+  transition:width .45s cubic-bezier(.2,.8,.2,1);
+}
 
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
+/* ---------- shell ---------- */
+.stage{
+  position:relative;z-index:1;
+  min-height:100dvh;
+  display:flex;flex-direction:column;
+  padding:0 24px;
+}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:24px 0 0;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);
+}
+body.hero-mode .topbar{color:var(--d-dim)}
+.topbar .mark{color:var(--ink);letter-spacing:.2em}
+body.hero-mode .topbar .mark{color:var(--d-ink)}
+.topbar .mark em{color:var(--accent);font-style:normal}
+.counter{font-variant-numeric:tabular-nums}
 
-        .header {
-            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
-        }
+.panel{
+  flex:1;display:flex;align-items:flex-start;justify-content:center;
+  padding:clamp(28px,7vh,80px) 0 140px;
+}
+.panel-inner{width:100%;max-width:700px}
 
-        .header h1 { font-size: 28px; margin-bottom: 10px; font-weight: 600; }
-        .header p { font-size: 14px; opacity: 0.9; }
+/* ---------- screens ---------- */
+.screen{display:none!important}
+.screen.active{display:block!important;animation:rise .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-        .scale-legend {
-            background: #f0f7f2;
-            border: 1px solid #c8e6c9;
-            border-radius: 8px;
-            padding: 20px 25px;
-            margin: 30px 30px 0;
-        }
+/* ---------- hero ---------- */
+#screen-intro{text-align:left}
+h1{
+  font-family:var(--display);
+  font-size:clamp(50px,9.5vw,98px);
+  line-height:.9;letter-spacing:.006em;
+  text-transform:uppercase;
+  margin-bottom:28px;
+  color:var(--d-ink);
+}
+h1 .hollow{
+  color:transparent;
+  -webkit-text-stroke:2px var(--accent);
+  display:block;
+}
+.lede{
+  font-size:18px;line-height:1.7;color:var(--d-dim);
+  max-width:50ch;margin-bottom:15px;font-weight:300;
+  letter-spacing:-.005em;
+}
+.lede strong{color:var(--d-ink);font-weight:500}
 
-        .scale-legend h3 {
-            font-size: 13px;
-            font-weight: 700;
-            color: #1a472a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
+/* ---------- artifact ---------- */
+.artifact{
+  position:relative;height:290px;margin:46px 0 42px;
+  display:flex;align-items:center;justify-content:center;
+  perspective:1400px;
+}
+.sheet{
+  position:absolute;width:196px;height:250px;
+  background:#fdfcfb;
+  border-radius:2px;
+  padding:18px 17px;
+  box-shadow:0 30px 60px -12px rgba(0,0,0,.75), 0 2px 6px rgba(0,0,0,.4);
+  display:flex;flex-direction:column;
+}
+.sheet-num{
+  font-family:var(--display);font-size:34px;line-height:1;
+  color:var(--accent);margin-bottom:2px;
+}
+.sheet-tag{
+  font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;
+  color:#8b837b;margin-bottom:14px;
+}
+.sheet-rule{height:1px;background:#e8e4e0;margin-bottom:14px}
+.sheet-head{
+  height:8px;background:#241f1a;border-radius:1px;margin-bottom:11px;width:78%;
+}
+.sheet-line{height:4px;background:#dcd7d2;border-radius:1px;margin-bottom:7px}
+.sheet-line.w95{width:95%}.sheet-line.w88{width:88%}.sheet-line.w80{width:80%}
+.sheet-line.w72{width:72%}.sheet-line.w64{width:64%}.sheet-line.w52{width:52%}
+.sheet-chip{
+  margin-top:auto;font-family:var(--mono);font-size:7px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--accent);
+  border:1px solid var(--accent-line);background:var(--accent-soft);
+  padding:4px 7px;border-radius:2px;align-self:flex-start;
+}
+.sheet-a{transform:rotate(-9deg) translateX(-142px) translateY(10px) scale(.9);opacity:.5}
+.sheet-c{transform:rotate(9deg) translateX(142px) translateY(10px) scale(.9);opacity:.5}
+.sheet-b{
+  z-index:3;width:215px;height:272px;
+  box-shadow:0 40px 80px -14px rgba(0,0,0,.9), 0 0 0 1px rgba(255,90,60,.25);
+}
 
-        .scale-legend-grid { display: grid; gap: 6px; }
+.q-sub{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+  color:var(--ink-faint);margin:-20px 0 26px;
+}
 
-        .scale-legend-item {
-            display: flex;
-            gap: 10px;
-            font-size: 12px;
-            color: #444;
-            line-height: 1.4;
-        }
+.q-sub-lede{
+  font-size:16px;line-height:1.65;color:var(--ink-dim);
+  margin:-18px 0 30px;max-width:50ch;font-weight:300;
+}
+.sub-q{
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink);margin:0 0 13px;
+}
+.sub-q em{color:var(--ink-faint);font-style:normal;letter-spacing:.1em}
+.checks + .sub-q{margin-top:34px}
+.free-text{
+  width:100%;background:var(--bg);
+  border:1.5px solid var(--line);border-radius:3px;
+  padding:14px 16px;font-family:var(--body);font-size:15.5px;
+  color:var(--ink);line-height:1.6;resize:vertical;
+  transition:border-color .15s;
+}
+.free-text::placeholder{color:var(--ink-faint)}
+.free-text:focus{outline:none;border-color:var(--accent)}
 
-        .scale-legend-num { font-weight: 700; color: #1a472a; min-width: 16px; }
+/* ---------- setup ---------- */
+.setup-lede{
+  font-size:17px;line-height:1.7;color:var(--ink-dim);
+  max-width:52ch;margin-bottom:26px;font-weight:300;
+}
+.legend{
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:6px 0;margin:0 0 28px;max-width:460px;
+}
+.legend-row{
+  display:flex;align-items:center;gap:20px;padding:11px 2px;
+}
+.legend-row + .legend-row{border-top:1px solid var(--line-soft)}
+.legend-row b{
+  font-family:var(--display);font-size:26px;line-height:1;
+  color:var(--accent);min-width:22px;font-weight:400;
+}
+.legend-row span{font-size:15.5px;color:var(--ink-dim)}
 
-        .content { padding: 0 30px 40px; }
+/* ---------- question ---------- */
+.q-section{
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:18px;
+}
+.q-section b{color:var(--accent);font-weight:500}
+.q-text{
+  font-family:var(--display);
+  font-size:clamp(32px,5.6vw,52px);
+  line-height:1.02;letter-spacing:.012em;text-transform:uppercase;
+  margin-bottom:30px;color:var(--ink);
+}
+.q-hint{
+  font-size:15px;color:var(--ink-dim);margin-bottom:34px;font-weight:300;line-height:1.6;
+}
 
-        .form-section { margin-bottom: 40px; margin-top: 30px; }
-        .form-section.hidden { display: none; }
 
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a472a;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #1a472a;
-            padding-bottom: 10px;
-        }
+/* scale — compact row */
+.scale-wrap{margin-top:6px}
+.scale{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:8px;
+}
+.opt{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  border:1.5px solid var(--line);border-radius:4px;
+  height:66px;cursor:pointer;
+  font-family:var(--display);font-size:30px;line-height:1;
+  color:var(--ink-faint);
+  transition:border-color .13s,background .13s,color .13s,transform .13s;
+}
+.opt:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-3px)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt.chosen{background:var(--accent);border-color:var(--accent);color:#fff}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
-        .question { margin-bottom: 28px; }
+.scale-ends{
+  display:flex;justify-content:space-between;margin-top:11px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-faint);
+}
+.anchor{
+  margin-top:22px;min-height:46px;
+  display:flex;align-items:center;
+  border-left:2px solid var(--line);padding-left:15px;
+  font-size:16px;color:var(--ink-faint);
+  transition:color .15s,border-color .15s;
+}
+.anchor.live{color:var(--ink);border-left-color:var(--accent)}
+.anchor b{font-family:var(--mono);font-size:12px;color:var(--accent);margin-right:11px;letter-spacing:.1em}
 
-        .question-text {
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 14px;
-            display: block;
-        }
+/* checkboxes */
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:8px}
+.chk{
+  display:flex;align-items:center;gap:13px;background:var(--bg);
+  border:1px solid var(--line);border-radius:3px;
+  padding:15px 17px;cursor:pointer;transition:border-color .15s,background .15s;
+}
+.chk:hover{border-color:var(--ink-faint);background:var(--raise)}
+.chk input{position:absolute;opacity:0;pointer-events:none}
+.chk .box{
+  width:16px;height:16px;border:1.5px solid var(--ink-faint);flex-shrink:0;
+  border-radius:2px;position:relative;transition:all .15s;
+}
+.chk .box::after{
+  content:'';position:absolute;inset:3px;background:var(--accent);border-radius:1px;
+  transform:scale(0);transition:transform .15s;
+}
+.chk.on{border-color:var(--accent);background:var(--accent-soft)}
+.chk.on .box{border-color:var(--accent)}
+.chk.on .box::after{transform:scale(1)}
+.chk span{font-size:15.5px;color:var(--ink-dim)}
+.chk.on span{color:var(--ink);font-weight:500}
+.chk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-        .scale-options { display: flex; gap: 6px; flex-wrap: wrap; }
+/* fields */
+.fields{display:grid;gap:22px;max-width:420px;margin-bottom:26px}
+.field label{
+  display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;
+}
+.field input{
+  width:100%;background:transparent;border:0;border-bottom:1.5px solid var(--line);
+  color:var(--ink);font-family:var(--body);font-size:19px;padding:8px 0;
+  transition:border-color .18s;
+}
+.field input::placeholder{color:var(--ink-faint)}
+.field input:focus{outline:none;border-bottom-color:var(--accent)}
+.consent{font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:50ch;margin-top:20px;font-weight:300}
 
-        .scale-option { display: flex; flex-direction: column; align-items: center; }
+/* buttons */
+.btn{
+  font-family:var(--display);font-size:19px;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--accent);color:#fff;border:0;border-radius:2px;
+  padding:16px 34px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:11px;
+  transition:transform .15s,filter .15s;
+}
+.btn:hover{filter:brightness(1.07);transform:translateY(-2px)}
+.btn:active{transform:none}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.btn-ghost{
+  background:transparent;color:var(--ink-faint);
+  border:1px solid var(--line);padding:15px 24px;
+}
+.btn-ghost:hover{color:var(--ink);border-color:var(--ink-faint);filter:none}
 
-        .scale-option input[type="radio"] {
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-            accent-color: #1a472a;
-            margin-bottom: 4px;
-        }
+/* nav bar */
+.navbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:40;
+  background:linear-gradient(to top,var(--bg) 65%,transparent);
+  padding:26px 24px 24px;
+}
+.navbar-inner{
+  width:100%;max-width:700px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.nav-hint{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-faint);
+}
+.nav-hint kbd{
+  border:1px solid var(--line);border-radius:2px;padding:2px 5px;margin:0 2px;color:var(--ink-dim);
+}
+.navbar.hidden{display:none}
 
-        .scale-option label {
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            padding: 6px 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            transition: all 0.2s;
-            min-width: 36px;
-            text-align: center;
-        }
+/* loading */
+.loading{display:none;text-align:center;padding:80px 0}
+.loading.on{display:block}
+.loading .bars{display:flex;gap:5px;justify-content:center;margin-bottom:28px;height:42px;align-items:flex-end}
+.loading .bars i{width:4px;background:var(--accent);border-radius:1px;animation:eq 1.1s ease-in-out infinite}
+.loading .bars i:nth-child(1){animation-delay:0s}
+.loading .bars i:nth-child(2){animation-delay:.13s}
+.loading .bars i:nth-child(3){animation-delay:.26s}
+.loading .bars i:nth-child(4){animation-delay:.39s}
+.loading .bars i:nth-child(5){animation-delay:.52s}
+@keyframes eq{0%,100%{height:9px}50%{height:42px}}
+.loading p{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-dim)}
 
-        .scale-option input[type="radio"]:checked + label {
-            background: #1a472a;
-            color: white;
-            border-color: #1a472a;
-        }
+/* error */
+.err{
+  display:none;border:1px solid var(--accent-line);background:var(--accent-soft);
+  border-radius:3px;padding:14px 17px;margin-bottom:24px;font-size:15px;color:var(--ink);
+}
+.err.on{display:block}
 
-        .weakness-checkboxes { display: grid; gap: 10px; }
+/* results */
+.results{display:none}
+.results.on{display:block}
 
-        .checkbox-item { display: flex; align-items: center; }
-
-        .checkbox-item input[type="checkbox"] {
-            margin-right: 10px;
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
-            accent-color: #1a472a;
-        }
-
-        .checkbox-item label { cursor: pointer; font-size: 13px; color: #555; }
-
-        /* Email capture section */
-        .email-gate {
-            background: #f0f7f2;
-            border: 2px solid #1a472a;
-            border-radius: 8px;
-            padding: 28px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-        }
-
-        .email-gate h3 {
-            font-size: 18px;
-            color: #1a472a;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .email-gate p {
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .email-gate-fields { display: grid; gap: 12px; }
-
-        .field-group { display: flex; flex-direction: column; gap: 6px; }
-
-        .field-group label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .field-group input {
-            padding: 10px 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-            width: 100%;
-        }
-
-        .field-group input:focus {
-            outline: none;
-            border-color: #1a472a;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
-            color: white;
-            border: none;
-            padding: 14px 40px;
-            font-size: 15px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 8px;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(26,71,42,0.3);
-        }
-
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .privacy-note {
-            font-size: 11px;
-            color: #888;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .loading { display: none; text-align: center; padding: 60px 20px; }
-        .loading.active { display: block; }
-
-        .spinner {
-            border: 3px solid #e0e0e0;
-            border-top: 3px solid #1a472a;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        .loading p { color: #555; font-size: 14px; }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .results { display: none; animation: fadeIn 0.5s ease-in; }
-        .results.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .results h2 { font-size: 20px; color: #1a472a; margin-bottom: 20px; margin-top: 30px; }
-        .results h3 { font-size: 16px; color: #2d5a3d; margin-top: 25px; margin-bottom: 15px; font-weight: 600; }
-        .results p, .results li { font-size: 13px; color: #555; margin-bottom: 10px; line-height: 1.7; }
-        .results ul { margin-left: 20px; margin-bottom: 15px; }
-        .results li { margin-bottom: 12px; }
-
-        .song-recommendation {
-            background: #f5f5f5;
-            padding: 15px;
-            border-left: 3px solid #1a472a;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-
-        .song-recommendation strong { color: #1a472a; }
-
-        .masterclass-link { color: #1a472a; font-weight: 600; }
-
-        .email-confirmation {
-            background: #f0f7f2;
-            border: 1px solid #c8e6c9;
-            border-radius: 6px;
-            padding: 14px 18px;
-            margin: 0 30px 20px;
-            font-size: 13px;
-            color: #2d5a3d;
-            display: none;
-        }
-
-        .email-confirmation.active { display: block; }
-
-        .error {
-            background: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .error.active { display: block; }
-
-        .form-wrapper { display: block; }
-        .form-wrapper.hidden { display: none; }
-
-        .unlock-notice {
-            font-size: 12px;
-            color: #888;
-            font-style: italic;
-            margin-bottom: 20px;
-            padding: 10px 14px;
-            background: #fafafa;
-            border-radius: 4px;
-            border-left: 3px solid #ddd;
-        }
-    </style>
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+@media (max-width:620px){
+  .scale{gap:6px}
+  .opt{height:54px;font-size:24px}
+  .anchor{font-size:15px;margin-top:18px}
+  .nav-hint{display:none}
+  .artifact{height:230px;margin:38px 0 34px}
+  .sheet{width:142px;height:190px;padding:14px 13px}
+  .sheet-b{width:158px;height:206px}
+  .sheet-a{transform:rotate(-9deg) translateX(-94px) translateY(8px) scale(.88)}
+  .sheet-c{transform:rotate(9deg) translateX(94px) translateY(8px) scale(.88)}
+}
+</style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Your Guitar Practice Plan</h1>
-            <p>Answer honestly and get a personalised plan based on where you're actually at</p>
+<body class="hero-mode">
+
+<div class="progress-rail"><div class="progress-fill" id="prog"></div></div>
+
+<div class="stage">
+  <div class="topbar">
+    <div class="mark">BOBBY <em>JARVIS JR</em></div>
+    <div class="counter" id="counter"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-inner">
+      <div class="err" id="err"></div>
+
+      <!-- INTRO -->
+      <section class="screen active" id="screen-intro">
+        <h1>Get your free<br>personalised<br><span class="hollow">Practice Pathway.</span></h1>
+        <p class="lede">The number one problem most players have is not knowing what to practise.</p>
+        <p class="lede">Fill in this questionnaire and I'll build you a pathway: what's holding you back, and what to work on first.</p>
+
+        <div class="artifact" aria-hidden="true">
+          <div class="sheet sheet-a">
+            <div class="sheet-num">02</div>
+            <div class="sheet-tag">Then this</div>
+            <div class="sheet-rule"></div>
+            <div class="sheet-head"></div>
+            <div class="sheet-line w88"></div>
+            <div class="sheet-line w95"></div>
+            <div class="sheet-line w64"></div>
+            <div class="sheet-chip">Triads</div>
+          </div>
+          <div class="sheet sheet-b">
+            <div class="sheet-num">01</div>
+            <div class="sheet-tag">Fix this first</div>
+            <div class="sheet-rule"></div>
+            <div class="sheet-head"></div>
+            <div class="sheet-line w95"></div>
+            <div class="sheet-line w80"></div>
+            <div class="sheet-line w88"></div>
+            <div class="sheet-line w52"></div>
+            <div class="sheet-chip">Neck navigation</div>
+          </div>
+          <div class="sheet sheet-c">
+            <div class="sheet-num">03</div>
+            <div class="sheet-tag">Then this</div>
+            <div class="sheet-rule"></div>
+            <div class="sheet-head"></div>
+            <div class="sheet-line w72"></div>
+            <div class="sheet-line w88"></div>
+            <div class="sheet-line w64"></div>
+            <div class="sheet-chip">Phrasing</div>
+          </div>
         </div>
 
-        <div class="scale-legend">
-            <h3>Rating Scale — be honest!</h3>
-            <div class="scale-legend-grid">
-                <div class="scale-legend-item"><span class="scale-legend-num">0</span><span>No knowledge at all</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">1</span><span>Started learning it but not using it yet</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">2</span><span>Just starting to implement it</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">3</span><span>Using it, but still thinking about it</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">4</span><span>Using it fairly confidently — occasionally get lost</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">5</span><span>Using it confidently and fluently</span></div>
-                <div class="scale-legend-item"><span class="scale-legend-num">6</span><span>Mastered across the entire neck</span></div>
-            </div>
+        <button class="btn" id="start">Build my pathway →</button>
+      </section>
+
+      <!-- SETUP -->
+      <section class="screen" id="screen-setup">
+        <div class="q-section">How this works</div>
+        <div class="q-text">Rate yourself,<br>honestly.</div>
+        <p class="setup-lede">I'm going to ask you some questions about different parts of your playing. For each one, give yourself a score out of six.</p>
+
+        <div class="legend">
+          <div class="legend-row"><b>0</b><span>No knowledge at all</span></div>
+          <div class="legend-row"><b>1</b><span>Started learning it, not using it yet</span></div>
+          <div class="legend-row"><b>2</b><span>Just starting to implement it</span></div>
+          <div class="legend-row"><b>3</b><span>Using it, but still thinking about it</span></div>
+          <div class="legend-row"><b>4</b><span>Fairly confident, occasionally get lost</span></div>
+          <div class="legend-row"><b>5</b><span>Confident and fluent</span></div>
+          <div class="legend-row"><b>6</b><span>Mastered across the whole neck</span></div>
         </div>
 
-        <div class="content">
-            <div class="error" id="error"></div>
+        <p class="setup-lede">The questions adapt as you go. Score low on something and I won't ask you about the stuff that comes after it. So don't inflate it. A flattering answer just gets you a pathway for a player you're not.</p>
 
-            <div class="form-wrapper" id="formWrapper">
-                <form id="assessmentForm">
+        <button class="btn" id="begin">Start →</button>
+      </section>
 
-                    <!-- FOUNDATIONS -->
-                    <div class="form-section" id="section-foundations">
-                        <div class="section-title">Foundations</div>
+      <!-- QUESTIONS injected here -->
+      <div id="questions"></div>
 
-                        <div class="question">
-                            <label class="question-text">Minor pentatonic — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mp_0" name="minor_pentatonic" value="0"><label for="mp_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_1" name="minor_pentatonic" value="1"><label for="mp_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_2" name="minor_pentatonic" value="2"><label for="mp_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_3" name="minor_pentatonic" value="3"><label for="mp_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_4" name="minor_pentatonic" value="4"><label for="mp_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_5" name="minor_pentatonic" value="5"><label for="mp_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mp_6" name="minor_pentatonic" value="6"><label for="mp_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Major pentatonic — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mjp_0" name="major_pentatonic" value="0"><label for="mjp_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_1" name="major_pentatonic" value="1"><label for="mjp_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_2" name="major_pentatonic" value="2"><label for="mjp_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_3" name="major_pentatonic" value="3"><label for="mjp_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_4" name="major_pentatonic" value="4"><label for="mjp_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_5" name="major_pentatonic" value="5"><label for="mjp_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mjp_6" name="major_pentatonic" value="6"><label for="mjp_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Major scale — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="ms_0" name="major_scale" value="0"><label for="ms_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_1" name="major_scale" value="1"><label for="ms_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_2" name="major_scale" value="2"><label for="ms_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_3" name="major_scale" value="3"><label for="ms_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_4" name="major_scale" value="4"><label for="ms_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_5" name="major_scale" value="5"><label for="ms_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="ms_6" name="major_scale" value="6"><label for="ms_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Bar chords — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="bc_0" name="bar_chords" value="0"><label for="bc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_1" name="bar_chords" value="1"><label for="bc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_2" name="bar_chords" value="2"><label for="bc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_3" name="bar_chords" value="3"><label for="bc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_4" name="bar_chords" value="4"><label for="bc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_5" name="bar_chords" value="5"><label for="bc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="bc_6" name="bar_chords" value="6"><label for="bc_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TRIADS — unlocks when major_scale >= 3 -->
-                    <div class="form-section hidden" id="section-triads">
-                        <div class="section-title">Triads</div>
-                        <div class="unlock-notice">Unlocked because your major scale is coming along — triads are the next logical step.</div>
-
-                        <div class="question">
-                            <label class="question-text">Major triads — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mjt_0" name="major_triads" value="0"><label for="mjt_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_1" name="major_triads" value="1"><label for="mjt_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_2" name="major_triads" value="2"><label for="mjt_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_3" name="major_triads" value="3"><label for="mjt_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_4" name="major_triads" value="4"><label for="mjt_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_5" name="major_triads" value="5"><label for="mjt_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mjt_6" name="major_triads" value="6"><label for="mjt_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor triads — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mt_0" name="minor_triads" value="0"><label for="mt_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_1" name="minor_triads" value="1"><label for="mt_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_2" name="minor_triads" value="2"><label for="mt_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_3" name="minor_triads" value="3"><label for="mt_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_4" name="minor_triads" value="4"><label for="mt_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_5" name="minor_triads" value="5"><label for="mt_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mt_6" name="minor_triads" value="6"><label for="mt_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Diminished triads — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="dt_0" name="diminished_triads" value="0"><label for="dt_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_1" name="diminished_triads" value="1"><label for="dt_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_2" name="diminished_triads" value="2"><label for="dt_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_3" name="diminished_triads" value="3"><label for="dt_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_4" name="diminished_triads" value="4"><label for="dt_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_5" name="diminished_triads" value="5"><label for="dt_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="dt_6" name="diminished_triads" value="6"><label for="dt_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 7TH CHORDS — unlocks when bar_chords >= 2 -->
-                    <div class="form-section hidden" id="section-seventh-chords">
-                        <div class="section-title">Chords & Harmony</div>
-                        <div class="unlock-notice">Unlocked because your bar chords are coming along — time to explore chord extensions.</div>
-
-                        <div class="question">
-                            <label class="question-text">Major chord shapes (CAGED) — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mjc_0" name="major_chords" value="0"><label for="mjc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_1" name="major_chords" value="1"><label for="mjc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_2" name="major_chords" value="2"><label for="mjc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_3" name="major_chords" value="3"><label for="mjc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_4" name="major_chords" value="4"><label for="mjc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_5" name="major_chords" value="5"><label for="mjc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mjc_6" name="major_chords" value="6"><label for="mjc_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor chord shapes (CAGED) — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mc_0" name="minor_chords" value="0"><label for="mc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_1" name="minor_chords" value="1"><label for="mc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_2" name="minor_chords" value="2"><label for="mc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_3" name="minor_chords" value="3"><label for="mc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_4" name="minor_chords" value="4"><label for="mc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_5" name="minor_chords" value="5"><label for="mc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mc_6" name="minor_chords" value="6"><label for="mc_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Major 7 chord shapes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="m7c_0" name="maj7_chords" value="0"><label for="m7c_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_1" name="maj7_chords" value="1"><label for="m7c_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_2" name="maj7_chords" value="2"><label for="m7c_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_3" name="maj7_chords" value="3"><label for="m7c_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_4" name="maj7_chords" value="4"><label for="m7c_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_5" name="maj7_chords" value="5"><label for="m7c_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="m7c_6" name="maj7_chords" value="6"><label for="m7c_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor 7 chord shapes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mn7c_0" name="min7_chords" value="0"><label for="mn7c_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_1" name="min7_chords" value="1"><label for="mn7c_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_2" name="min7_chords" value="2"><label for="mn7c_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_3" name="min7_chords" value="3"><label for="mn7c_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_4" name="min7_chords" value="4"><label for="mn7c_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_5" name="min7_chords" value="5"><label for="mn7c_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7c_6" name="min7_chords" value="6"><label for="mn7c_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Dominant 7 chord shapes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="d7c_0" name="dom7_chords" value="0"><label for="d7c_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_1" name="dom7_chords" value="1"><label for="d7c_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_2" name="dom7_chords" value="2"><label for="d7c_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_3" name="dom7_chords" value="3"><label for="d7c_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_4" name="dom7_chords" value="4"><label for="d7c_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_5" name="dom7_chords" value="5"><label for="d7c_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="d7c_6" name="dom7_chords" value="6"><label for="d7c_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ARPEGGIOS — unlocks when major_triads OR minor_triads >= 2 -->
-                    <div class="form-section hidden" id="section-arpeggios">
-                        <div class="section-title">Arpeggios</div>
-                        <div class="unlock-notice">Unlocked because your triads are developing — arpeggios are the natural next step.</div>
-
-                        <div class="question">
-                            <label class="question-text">Major arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mja_0" name="major_arps" value="0"><label for="mja_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_1" name="major_arps" value="1"><label for="mja_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_2" name="major_arps" value="2"><label for="mja_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_3" name="major_arps" value="3"><label for="mja_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_4" name="major_arps" value="4"><label for="mja_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_5" name="major_arps" value="5"><label for="mja_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mja_6" name="major_arps" value="6"><label for="mja_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mna_0" name="minor_arps" value="0"><label for="mna_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_1" name="minor_arps" value="1"><label for="mna_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_2" name="minor_arps" value="2"><label for="mna_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_3" name="minor_arps" value="3"><label for="mna_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_4" name="minor_arps" value="4"><label for="mna_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_5" name="minor_arps" value="5"><label for="mna_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mna_6" name="minor_arps" value="6"><label for="mna_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ADVANCED — unlocks when major_arps OR minor_arps >= 2 -->
-                    <div class="form-section hidden" id="section-advanced">
-                        <div class="section-title">Advanced Harmony</div>
-                        <div class="unlock-notice">Unlocked because your arpeggios are developing — time to dig into the deeper stuff.</div>
-
-                        <div class="question">
-                            <label class="question-text">Major 7 arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="m7a_0" name="maj7_arps" value="0"><label for="m7a_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_1" name="maj7_arps" value="1"><label for="m7a_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_2" name="maj7_arps" value="2"><label for="m7a_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_3" name="maj7_arps" value="3"><label for="m7a_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_4" name="maj7_arps" value="4"><label for="m7a_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_5" name="maj7_arps" value="5"><label for="m7a_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="m7a_6" name="maj7_arps" value="6"><label for="m7a_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Minor 7 arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mn7a_0" name="min7_arps" value="0"><label for="mn7a_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_1" name="min7_arps" value="1"><label for="mn7a_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_2" name="min7_arps" value="2"><label for="mn7a_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_3" name="min7_arps" value="3"><label for="mn7a_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_4" name="min7_arps" value="4"><label for="mn7a_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_5" name="min7_arps" value="5"><label for="mn7a_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mn7a_6" name="min7_arps" value="6"><label for="mn7a_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Dominant 7 arpeggios — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="d7a_0" name="dom7_arps" value="0"><label for="d7a_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_1" name="dom7_arps" value="1"><label for="d7a_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_2" name="dom7_arps" value="2"><label for="d7a_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_3" name="dom7_arps" value="3"><label for="d7a_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_4" name="dom7_arps" value="4"><label for="d7a_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_5" name="dom7_arps" value="5"><label for="d7a_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="d7a_6" name="dom7_arps" value="6"><label for="d7a_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Harmonised major scale / diatonic chord sequences — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="hms_0" name="harmonized_major_scale" value="0"><label for="hms_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_1" name="harmonized_major_scale" value="1"><label for="hms_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_2" name="harmonized_major_scale" value="2"><label for="hms_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_3" name="harmonized_major_scale" value="3"><label for="hms_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_4" name="harmonized_major_scale" value="4"><label for="hms_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_5" name="harmonized_major_scale" value="5"><label for="hms_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="hms_6" name="harmonized_major_scale" value="6"><label for="hms_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Chord-tone targeting / chord navigation — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="ct_0" name="chord_targeting" value="0"><label for="ct_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_1" name="chord_targeting" value="1"><label for="ct_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_2" name="chord_targeting" value="2"><label for="ct_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_3" name="chord_targeting" value="3"><label for="ct_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_4" name="chord_targeting" value="4"><label for="ct_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_5" name="chord_targeting" value="5"><label for="ct_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="ct_6" name="chord_targeting" value="6"><label for="ct_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Modes — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mod_0" name="modes" value="0"><label for="mod_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_1" name="modes" value="1"><label for="mod_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_2" name="modes" value="2"><label for="mod_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_3" name="modes" value="3"><label for="mod_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_4" name="modes" value="4"><label for="mod_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_5" name="modes" value="5"><label for="mod_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mod_6" name="modes" value="6"><label for="mod_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NAVIGATION — always visible -->
-                    <div class="form-section" id="section-navigation">
-                        <div class="section-title">Navigation</div>
-
-                        <div class="question">
-                            <label class="question-text">Finding root notes on the neck — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="rn_0" name="root_notes" value="0"><label for="rn_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_1" name="root_notes" value="1"><label for="rn_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_2" name="root_notes" value="2"><label for="rn_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_3" name="root_notes" value="3"><label for="rn_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_4" name="root_notes" value="4"><label for="rn_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_5" name="root_notes" value="5"><label for="rn_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="rn_6" name="root_notes" value="6"><label for="rn_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Finding the same note across different strings and positions — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="sn_0" name="same_note" value="0"><label for="sn_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_1" name="same_note" value="1"><label for="sn_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_2" name="same_note" value="2"><label for="sn_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_3" name="same_note" value="3"><label for="sn_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_4" name="same_note" value="4"><label for="sn_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_5" name="same_note" value="5"><label for="sn_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="sn_6" name="same_note" value="6"><label for="sn_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TECHNIQUE — unlocks when minor_pentatonic OR major_pentatonic >= 4 -->
-                    <div class="form-section hidden" id="section-technique">
-                        <div class="section-title">Technique & Control</div>
-                        <div class="unlock-notice">Unlocked because your pentatonics are solid — these questions are about refining how you play, not just what you know.</div>
-
-                        <div class="question">
-                            <label class="question-text">Timing / rhythm accuracy — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="tim_0" name="timing" value="0"><label for="tim_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_1" name="timing" value="1"><label for="tim_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_2" name="timing" value="2"><label for="tim_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_3" name="timing" value="3"><label for="tim_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_4" name="timing" value="4"><label for="tim_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_5" name="timing" value="5"><label for="tim_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="tim_6" name="timing" value="6"><label for="tim_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Pocket / groove feel — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="poc_0" name="pocket" value="0"><label for="poc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_1" name="pocket" value="1"><label for="poc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_2" name="pocket" value="2"><label for="poc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_3" name="pocket" value="3"><label for="poc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_4" name="pocket" value="4"><label for="poc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_5" name="pocket" value="5"><label for="poc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="poc_6" name="pocket" value="6"><label for="poc_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Bending accuracy & control — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="ba_0" name="bending_accuracy" value="0"><label for="ba_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_1" name="bending_accuracy" value="1"><label for="ba_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_2" name="bending_accuracy" value="2"><label for="ba_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_3" name="bending_accuracy" value="3"><label for="ba_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_4" name="bending_accuracy" value="4"><label for="ba_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_5" name="bending_accuracy" value="5"><label for="ba_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="ba_6" name="bending_accuracy" value="6"><label for="ba_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Vibrato control & consistency — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="vc_0" name="vibrato_control" value="0"><label for="vc_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_1" name="vibrato_control" value="1"><label for="vc_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_2" name="vibrato_control" value="2"><label for="vc_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_3" name="vibrato_control" value="3"><label for="vc_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_4" name="vibrato_control" value="4"><label for="vc_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_5" name="vibrato_control" value="5"><label for="vc_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="vc_6" name="vibrato_control" value="6"><label for="vc_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Vibrato musicality / phrasing — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="vm_0" name="vibrato_musicality" value="0"><label for="vm_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_1" name="vibrato_musicality" value="1"><label for="vm_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_2" name="vibrato_musicality" value="2"><label for="vm_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_3" name="vibrato_musicality" value="3"><label for="vm_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_4" name="vibrato_musicality" value="4"><label for="vm_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_5" name="vibrato_musicality" value="5"><label for="vm_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="vm_6" name="vibrato_musicality" value="6"><label for="vm_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Picking technique / hand positioning — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="pic_0" name="picking" value="0"><label for="pic_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_1" name="picking" value="1"><label for="pic_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_2" name="picking" value="2"><label for="pic_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_3" name="picking" value="3"><label for="pic_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_4" name="picking" value="4"><label for="pic_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_5" name="picking" value="5"><label for="pic_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="pic_6" name="picking" value="6"><label for="pic_6">6</label></div>
-                            </div>
-                        </div>
-
-                        <div class="question">
-                            <label class="question-text">Muting / noise control — how would you rate yourself?</label>
-                            <div class="scale-options">
-                                <div class="scale-option"><input type="radio" id="mut_0" name="muting" value="0"><label for="mut_0">0</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_1" name="muting" value="1"><label for="mut_1">1</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_2" name="muting" value="2"><label for="mut_2">2</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_3" name="muting" value="3"><label for="mut_3">3</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_4" name="muting" value="4"><label for="mut_4">4</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_5" name="muting" value="5"><label for="mut_5">5</label></div>
-                                <div class="scale-option"><input type="radio" id="mut_6" name="muting" value="6"><label for="mut_6">6</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- STRUGGLES — always visible -->
-                    <div class="form-section" id="section-struggles">
-                        <div class="section-title">What Do You Struggle With?</div>
-                        <div class="question">
-                            <label class="question-text">Select all that apply:</label>
-                            <div class="weakness-checkboxes">
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_timing" name="struggles" value="timing"><label for="struggle_timing">Timing / staying in time</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_phrasing" name="struggles" value="phrasing"><label for="struggle_phrasing">Phrasing / musicality</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_accuracy" name="struggles" value="accuracy"><label for="struggle_accuracy">Accuracy / hitting notes</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_transitions" name="struggles" value="transitions"><label for="struggle_transitions">Transitions between positions</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_bending" name="struggles" value="bending"><label for="struggle_bending">Bending</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_chord_changes" name="struggles" value="chord_changes"><label for="struggle_chord_changes">Chord changes</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_vibrato" name="struggles" value="vibrato"><label for="struggle_vibrato">Vibrato control</label></div>
-                                <div class="checkbox-item"><input type="checkbox" id="struggle_navigation" name="struggles" value="navigation"><label for="struggle_navigation">Finding my way around the neck</label></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- EMAIL GATE — sits between questions and submit -->
-                    <div class="email-gate">
-                        <h3>Where should we send your plan?</h3>
-                        <p>Enter your details below and we'll email you a copy of your personalised practice plan so you can refer back to it anytime.</p>
-                        <div class="email-gate-fields">
-                            <div class="field-group">
-                                <label for="userName">First name</label>
-                                <input type="text" id="userName" name="userName" placeholder="Your first name" required>
-                            </div>
-                            <div class="field-group">
-                                <label for="userEmail">Email address</label>
-                                <input type="email" id="userEmail" name="userEmail" placeholder="your@email.com" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="submit-btn" id="submitBtn">Generate My Practice Plan →</button>
-                    <p class="privacy-note">By submitting this form you agree to receive occasional emails from Bobby Jarvis Jr including guitar tips, masterclass updates, and practice resources. You can unsubscribe at any time.</p>
-
-                </form>
-            </div>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Building your personalised practice plan...</p>
-            </div>
-
-            <div class="results" id="results"></div>
+      <!-- CAPTURE -->
+      <section class="screen" id="screen-capture">
+        <div class="q-section">Last bit</div>
+        <div class="q-text">Where do I send it?</div>
+        <p class="q-hint">Shows up on screen straight away. I'll email a copy too, so you've still got it next week.</p>
+        <div class="fields">
+          <div class="field">
+            <label for="userName">First name</label>
+            <input type="text" id="userName" placeholder="Bobby" autocomplete="given-name">
+          </div>
+          <div class="field">
+            <label for="userEmail">Email</label>
+            <input type="email" id="userEmail" placeholder="you@email.com" autocomplete="email">
+          </div>
         </div>
+        <button class="btn" id="submitBtn">Show me my pathway →</button>
+        <p class="consent">You'll get the odd email from me. Guitar stuff, new lessons, nothing daft. Unsubscribe whenever.</p>
+      </section>
+
+      <!-- LOADING -->
+      <div class="loading" id="loading">
+        <div class="bars"><i></i><i></i><i></i><i></i><i></i></div>
+        <p id="loadMsg">Reading your answers</p>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="results" id="results"></div>
     </div>
+  </div>
+</div>
 
-    <script>
-        // — Branching logic —
-        const scores = {};
+<div class="navbar hidden" id="navbar">
+  <div class="navbar-inner">
+    <button class="btn btn-ghost" id="back">← Back</button>
+    <div class="nav-hint">Press <kbd>0</kbd>–<kbd>6</kbd> to answer</div>
+  </div>
+</div>
 
-        function getScore(fieldName) { return scores[fieldName] || 0; }
+<script>
+/* ============ CONTENT ============ */
+const ANCHORS = [
+  "No knowledge at all",
+  "Started learning it, not using it yet",
+  "Just starting to implement it",
+  "Using it, but still thinking about it",
+  "Fairly confident, occasionally get lost",
+  "Confident and fluent",
+  "Mastered across the whole neck"
+];
 
-        function showSection(id) { document.getElementById(id).classList.remove('hidden'); }
-        function hideSection(id) { document.getElementById(id).classList.add('hidden'); }
+// section: label shown as eyebrow
+// unlock: fn(scores) -> bool  (undefined = always shown)
+const SECTIONS = [
+  { id:'foundations', label:'Foundations', questions:[
+    { name:'minor_pentatonic', text:'Minor pentatonic' },
+    { name:'major_pentatonic', text:'Major pentatonic' },
+    { name:'major_scale',      text:'Major scale' },
+    { name:'bar_chords',       text:'Barre chords' }
+  ]},
+  { id:'navigation', label:'Navigation', questions:[
+    { name:'root_notes', text:'Finding root notes on the neck' }
+  ]},
+  { id:'triads', label:'Triads',
+    unlock:s => s.major_scale >= 3,
+    questions:[
+      { name:'major_triads',      text:'Major triads' },
+      { name:'minor_triads',      text:'Minor triads' },
+      { name:'diminished_triads', text:'Diminished triads' }
+  ]},
+  { id:'chords', label:'Chords & Harmony',
+    unlock:s => s.bar_chords >= 2,
+    questions:[
+      { name:'major_chords', text:'Major chord shapes (CAGED)' },
+      { name:'minor_chords', text:'Minor chord shapes (CAGED)' },
+      { name:'seventh_chords', text:'7th chord shapes', sub:'Major 7, minor 7, dominant 7, minor 7 flat 5' }
+  ]},
+  { id:'arpeggios', label:'Arpeggios',
+    unlock:s => s.major_triads >= 2 || s.minor_triads >= 2,
+    questions:[
+      { name:'major_arps', text:'Major arpeggios' },
+      { name:'minor_arps', text:'Minor arpeggios' }
+  ]},
+  { id:'advanced', label:'Advanced Harmony',
+    unlock:s => s.major_arps >= 2 || s.minor_arps >= 2,
+    questions:[
+      { name:'seventh_arps', text:'7th arpeggios', sub:'Major 7, minor 7, dominant 7, minor 7 flat 5' },
+      { name:'harmonized_major_scale', text:'Knowing the chords in a key' },
+      { name:'chord_targeting', text:'Chord-tone targeting' },
+      { name:'modes', text:'Modes' }
+  ]},
+  { id:'technique', label:'Technique & Control',
+    unlock:s => s.minor_pentatonic >= 4 || s.major_pentatonic >= 4,
+    questions:[
+      { name:'timing',           text:'Playing in time' },
+      { name:'bending_accuracy', text:'Bending in tune' },
+      { name:'vibrato_control',  text:'Vibrato' },
+      { name:'muting',           text:'Muting and noise control' }
+  ]}
+];
 
-        function updateBranching() {
-            if (getScore('major_scale') >= 3) showSection('section-triads');
-            else hideSection('section-triads');
+const STRUGGLES = [
+  ['timing','Staying in time'],
+  ['phrasing','Phrasing and musicality'],
+  ['accuracy','Hitting the right notes'],
+  ['transitions','Moving between positions'],
+  ['bending','Bending'],
+  ['chord_changes','Chord changes'],
+  ['vibrato','Vibrato'],
+  ['navigation','Finding my way round the neck']
+];
 
-            if (getScore('bar_chords') >= 2) showSection('section-seventh-chords');
-            else hideSection('section-seventh-chords');
+const GOALS = [
+  ['gig','Play live, or get back to it'],
+  ['jam','Hold my own jamming with other people'],
+  ['write','Write and record my own stuff'],
+  ['solo','Improvise and solo confidently'],
+  ['songs','Play the songs I actually love properly'],
+  ['self','Just play better, for me']
+];
 
-            if (getScore('major_triads') >= 2 || getScore('minor_triads') >= 2) showSection('section-arpeggios');
-            else hideSection('section-arpeggios');
+const SCALE_FIELDS = ['minor_pentatonic','major_pentatonic','major_scale','bar_chords','modes'];
+const TRIAD_FIELDS = ['major_triads','minor_triads','diminished_triads'];
+const CHORD_FIELDS = ['major_chords','minor_chords','seventh_chords','harmonized_major_scale','chord_targeting'];
+const ARP_FIELDS   = ['major_arps','minor_arps','seventh_arps'];
+const NAV_FIELDS   = ['root_notes'];
 
-            if (getScore('major_arps') >= 2 || getScore('minor_arps') >= 2) showSection('section-advanced');
-            else hideSection('section-advanced');
+/* ============ STATE ============ */
+const scores = {};
+const struggles = new Set();
+const goals = new Set();
+let freeText = '';
+let queue = [];        // flattened list of screen descriptors
+let idx = -1;          // -1 = intro
+const container = document.getElementById('questions');
+const progEl = document.getElementById('prog');
+const counterEl = document.getElementById('counter');
+const navbar = document.getElementById('navbar');
 
-            if (getScore('minor_pentatonic') >= 4 || getScore('major_pentatonic') >= 4) showSection('section-technique');
-            else hideSection('section-technique');
-        }
+/* Build the queue from whatever is currently unlocked. */
+function rebuildQueue(){
+  const q = [];
+  SECTIONS.forEach(sec => {
+    if (sec.unlock && !sec.unlock(scores)) return;
+    sec.questions.forEach(question => {
+      q.push({ kind:'scale', sec, question });
+    });
+  });
+  q.push({ kind:'struggles' });
+  queue = q;
+}
 
-        document.getElementById('assessmentForm').addEventListener('change', (e) => {
-            if (e.target.type === 'radio') {
-                scores[e.target.name] = parseInt(e.target.value);
-                updateBranching();
-            }
-        });
+/* ============ RENDER ============ */
+function screenId(item){
+  return item.kind === 'struggles' ? 'sc-struggles' : 'sc-' + item.question.name;
+}
 
-        // — Form submission —
-        const API_BASE = window.location.origin;
-        const form = document.getElementById('assessmentForm');
-        const loading = document.getElementById('loading');
-        const results = document.getElementById('results');
-        const errorDiv = document.getElementById('error');
-        const formWrapper = document.getElementById('formWrapper');
+function buildScreen(item){
+  const el = document.createElement('section');
+  el.className = 'screen';
+  el.id = screenId(item);
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            errorDiv.classList.remove('active');
+  if (item.kind === 'struggles'){
+    el.innerHTML = `
+      <div class="q-section">Last one</div>
+      <div class="q-text">In your words.</div>
+      <p class="q-sub-lede">The scores tell me what you know. This tells me what you're actually trying to do.</p>
 
-            const name = document.getElementById('userName').value.trim();
-            const email = document.getElementById('userEmail').value.trim();
+      <div class="sub-q">What do you want to be able to do?</div>
+      <div class="checks">
+        ${GOALS.map(([v,l]) => `
+          <div class="chk goal" tabindex="0" data-val="${v}">
+            <input type="checkbox" value="${v}">
+            <div class="box"></div><span>${l}</span>
+          </div>`).join('')}
+      </div>
 
-            if (!name || !email) {
-                errorDiv.textContent = 'Please enter your name and email to receive your plan.';
-                errorDiv.classList.add('active');
-                return;
-            }
+      <div class="sub-q">What trips you up?</div>
+      <div class="checks">
+        ${STRUGGLES.map(([v,l]) => `
+          <div class="chk struggle" tabindex="0" data-val="${v}">
+            <input type="checkbox" value="${v}">
+            <div class="box"></div><span>${l}</span>
+          </div>`).join('')}
+      </div>
 
-            const formData = new FormData(form);
-            const data = {
-                name: name,
-                email: email,
-                scales: {},
-                triads: {},
-                chords: {},
-                arpeggios: {},
-                navigation: {},
-                technique: {},
-                struggles: []
-            };
+      <div class="sub-q">Anything else? <em>Optional</em></div>
+      <textarea id="freeText" class="free-text" rows="3" placeholder="The thing you've been stuck on, what you've already tried, how long you've been at it. Whatever's useful."></textarea>
 
-            for (const [key, value] of formData.entries()) {
-                if (key === 'struggles') {
-                    data.struggles.push(value);
-                } else if (key === 'userName' || key === 'userEmail') {
-                    // already captured above
-                } else if (['minor_pentatonic', 'major_pentatonic', 'major_scale', 'bar_chords', 'modes'].includes(key)) {
-                    data.scales[key] = parseInt(value);
-                } else if (['major_triads', 'minor_triads', 'diminished_triads'].includes(key)) {
-                    data.triads[key] = parseInt(value);
-                } else if (['major_chords', 'minor_chords', 'maj7_chords', 'min7_chords', 'dom7_chords', 'harmonized_major_scale', 'chord_targeting', 'slash_chords'].includes(key)) {
-                    data.chords[key] = parseInt(value);
-                } else if (['major_arps', 'minor_arps', 'maj7_arps', 'min7_arps', 'dom7_arps', 'dim_arps'].includes(key)) {
-                    data.arpeggios[key] = parseInt(value);
-                } else if (['root_notes', 'same_note'].includes(key)) {
-                    data.navigation[key] = parseInt(value);
-                } else {
-                    data.technique[key] = parseInt(value);
-                }
-            }
+      <div style="margin-top:32px"><button class="btn" data-next>Nearly there →</button></div>`;
 
-            formWrapper.classList.add('hidden');
-            loading.classList.add('active');
-            results.classList.remove('active');
+    el.querySelectorAll('.chk').forEach(chk => {
+      const isGoal = chk.classList.contains('goal');
+      const toggle = () => {
+        const v = chk.dataset.val;
+        chk.classList.toggle('on');
+        const on = chk.classList.contains('on');
+        const set = isGoal ? goals : struggles;
+        on ? set.add(v) : set.delete(v);
+        chk.querySelector('input').checked = on;
+      };
+      chk.addEventListener('click', toggle);
+      chk.addEventListener('keydown', e => {
+        if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(); }
+      });
+    });
+    el.querySelector('[data-next]').addEventListener('click', goCapture);
+    return el;
+  }
 
-            try {
-                const response = await fetch(`${API_BASE}/api/generate-plan`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+  const { sec, question } = item;
+  el.innerHTML = `
+    <div class="q-section"><b>${sec.label}</b></div>
+    <div class="q-text">${question.text}</div>
+    ${question.sub ? `<p class="q-sub">${question.sub}</p>` : ''}
+    <div class="scale-wrap">
+      <div class="scale">
+        ${ANCHORS.map((a,n) => `
+          <div class="opt" tabindex="0" data-score="${n}" data-anchor="${a}">
+            <input type="radio" name="${question.name}" value="${n}">${n}
+          </div>`).join('')}
+      </div>
+      <div class="scale-ends"><span>No idea</span><span>Mastered</span></div>
+      <div class="anchor" data-anchor-out>Pick a number, or press 0–6.</div>
+    </div>`;
 
-                if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+  const anchorOut = el.querySelector('[data-anchor-out]');
+  const setAnchor = (n, a) => {
+    anchorOut.innerHTML = `<b>${n}</b>${a}`;
+    anchorOut.classList.add('live');
+  };
+  const clearAnchor = () => {
+    const v = scores[question.name];
+    if (v === undefined){
+      anchorOut.textContent = 'Pick a number, or press 0–6.';
+      anchorOut.classList.remove('live');
+    } else {
+      setAnchor(v, ANCHORS[v]);
+    }
+  };
 
-                const result = await response.json();
-                loading.classList.remove('active');
-                results.innerHTML = `<p style="color:#2d5a3d; font-size:13px; margin-bottom:20px;">✓ Your plan has been sent to <strong>${email}</strong> — check your inbox.</p>` + result.plan;
-                results.classList.add('active');
-                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  el.querySelectorAll('.opt').forEach(opt => {
+    const n = parseInt(opt.dataset.score,10);
+    const choose = () => pick(question.name, n);
+    opt.addEventListener('click', choose);
+    opt.addEventListener('mouseenter', () => setAnchor(n, opt.dataset.anchor));
+    opt.addEventListener('mouseleave', clearAnchor);
+    opt.addEventListener('focus', () => setAnchor(n, opt.dataset.anchor));
+    opt.addEventListener('blur', clearAnchor);
+    opt.addEventListener('keydown', e => {
+      if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); choose(); }
+    });
+  });
+  return el;
+}
 
-            } catch (error) {
-                console.error('Error:', error);
-                loading.classList.remove('active');
-                errorDiv.textContent = `Something went wrong: ${error.message}`;
-                errorDiv.classList.add('active');
-                formWrapper.classList.remove('hidden');
-            }
-        });
-    </script>
+function markChosen(item){
+  if (item.kind !== 'scale') return;
+  const el = document.getElementById(screenId(item));
+  if (!el) return;
+  const val = scores[item.question.name];
+  el.querySelectorAll('.opt').forEach(o => {
+    o.classList.toggle('chosen', parseInt(o.dataset.score,10) === val);
+  });
+  const out = el.querySelector('[data-anchor-out]');
+  if (out){
+    if (val === undefined){
+      out.textContent = 'Pick a number, or press 0\u20136.';
+      out.classList.remove('live');
+    } else {
+      out.innerHTML = '<b>' + val + '</b>' + ANCHORS[val];
+      out.classList.add('live');
+    }
+  }
+}
+
+function show(i){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const item = queue[i];
+  let el = document.getElementById(screenId(item));
+  if (!el){ el = buildScreen(item); container.appendChild(el); }
+  markChosen(item);
+  el.classList.add('active');
+  idx = i;
+  updateChrome();
+  window.scrollTo({ top:0, behavior:'instant' });
+}
+
+function updateChrome(){
+  const total = queue.length;
+  const done = idx;
+  progEl.style.width = Math.min(100, (done / total) * 100) + '%';
+  counterEl.textContent = idx >= 0 ? `${idx + 1} / ~${total}` : '';
+  navbar.classList.toggle('hidden', idx < 0);
+  document.getElementById('back').style.visibility = idx >= 0 ? 'visible' : 'hidden';
+}
+
+/* ============ FLOW ============ */
+function pick(name, value){
+  scores[name] = value;
+  const wasLength = queue.length;
+  rebuildQueue();
+  // current item may have shifted position after unlock — find it again
+  const current = queue.findIndex(q => q.kind === 'scale' && q.question.name === name);
+  const nextIdx = current + 1;
+  markChosen(queue[current]);
+  setTimeout(() => {
+    if (nextIdx < queue.length) show(nextIdx);
+    else goCapture();
+  }, 180);
+}
+
+function goCapture(){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-capture').classList.add('active');
+  progEl.style.width = '100%';
+  counterEl.textContent = '';
+  navbar.classList.add('hidden');
+  window.scrollTo({ top:0, behavior:'instant' });
+  idx = queue.length; // past the end
+}
+
+document.getElementById('start').addEventListener('click', () => {
+  document.body.classList.remove('hero-mode');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-setup').classList.add('active');
+  window.scrollTo({ top:0, behavior:'instant' });
+});
+
+document.getElementById('begin').addEventListener('click', () => {
+  rebuildQueue();
+  show(0);
+});
+
+document.getElementById('back').addEventListener('click', () => {
+  if (idx > 0){ show(idx - 1); return; }
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-setup').classList.add('active');
+  navbar.classList.add('hidden');
+  progEl.style.width = '0%';
+  counterEl.textContent = '';
+  idx = -1;
+  window.scrollTo({ top:0, behavior:'instant' });
+});
+
+document.addEventListener('keydown', e => {
+  if (idx < 0 || idx >= queue.length) return;
+  const item = queue[idx];
+  if (item.kind === 'scale' && /^[0-6]$/.test(e.key)){
+    pick(item.question.name, parseInt(e.key,10));
+  }
+  if (e.key === 'ArrowLeft' && idx > 0) show(idx - 1);
+});
+
+/* ============ SUBMIT ============ */
+const API_BASE = window.location.origin;
+const errEl = document.getElementById('err');
+const loadingEl = document.getElementById('loading');
+const loadMsg = document.getElementById('loadMsg');
+const resultsEl = document.getElementById('results');
+
+const LOAD_MESSAGES = [
+  'Reading your answers',
+  'Working out what actually matters',
+  'Putting it in the right order',
+  'Building your pathway'
+];
+
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  const ft = document.getElementById('freeText');
+  if (ft) freeText = ft.value.trim();
+  const name = document.getElementById('userName').value.trim();
+  const email = document.getElementById('userEmail').value.trim();
+  errEl.classList.remove('on');
+
+  if (!name || !email){
+    errEl.textContent = 'I need a name and an email to send this to.';
+    errEl.classList.add('on');
+    return;
+  }
+
+  const payload = {
+    name, email,
+    scales:{}, triads:{}, chords:{}, arpeggios:{}, navigation:{}, technique:{},
+    struggles:[...struggles],
+    goals:[...goals],
+    notes: freeText
+  };
+
+  Object.entries(scores).forEach(([k,v]) => {
+    if (SCALE_FIELDS.includes(k)) payload.scales[k] = v;
+    else if (TRIAD_FIELDS.includes(k)) payload.triads[k] = v;
+    else if (CHORD_FIELDS.includes(k)) payload.chords[k] = v;
+    else if (ARP_FIELDS.includes(k)) payload.arpeggios[k] = v;
+    else if (NAV_FIELDS.includes(k)) payload.navigation[k] = v;
+    else payload.technique[k] = v;
+  });
+
+  document.getElementById('screen-capture').classList.remove('active');
+  loadingEl.classList.add('on');
+  let m = 0;
+  const cycle = setInterval(() => {
+    m = (m + 1) % LOAD_MESSAGES.length;
+    loadMsg.textContent = LOAD_MESSAGES[m];
+  }, 2600);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/generate-plan`, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(res.statusText || 'Request failed');
+    const data = await res.json();
+    clearInterval(cycle);
+    loadingEl.classList.remove('on');
+    resultsEl.innerHTML = data.plan;
+    resultsEl.classList.add('on');
+    window.scrollTo({ top:0, behavior:'instant' });
+  } catch (err){
+    clearInterval(cycle);
+    loadingEl.classList.remove('on');
+    errEl.textContent = 'That didn\'t go through: ' + err.message + '. Have another go.';
+    errEl.classList.add('on');
+    document.getElementById('screen-capture').classList.add('active');
+  }
+});
+</script>
 </body>
 </html>
