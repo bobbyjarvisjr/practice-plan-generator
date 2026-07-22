@@ -19,7 +19,7 @@ const anthropic = new Anthropic({
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library';
-const PHRASING_URL = 'https://www.bobbyjarvisjr.com/products/pentatonic-phrasing-course';
+const PHRASING_URL = 'https://www.bobbyjarvisjr.com/products/pentatonic-phrasing-challenge-complete-4-week-series';
 const FROM_EMAIL = 'jarvis@bobbyjarvisjr.com';
 const RESEND_AUDIENCE_ID = '75f227cf-4d8c-429a-8fcf-ee71f69c70fd';
 
