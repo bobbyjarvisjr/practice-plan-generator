@@ -91,79 +91,6 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
 .screen.active{display:block!important;animation:rise .34s var(--ease)}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-/* ---------- hero ---------- */
-#screen-intro{text-align:left}
-.hero-eyebrow{
-  display:flex;align-items:center;gap:14px;
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:26px;
-}
-.hero-eyebrow::after{content:'';width:44px;height:1px;background:var(--d-line)}
-h1{
-  font-family:var(--display);
-  font-size:clamp(50px,9.5vw,98px);
-  line-height:.9;letter-spacing:.006em;
-  text-transform:uppercase;
-  margin-bottom:28px;
-  color:var(--d-ink);
-  text-wrap:balance;
-}
-h1 .hollow{
-  color:transparent;
-  -webkit-text-stroke:2px var(--accent);
-  display:block;
-}
-.lede{
-  font-size:18px;line-height:1.7;color:var(--d-dim);
-  max-width:50ch;margin-bottom:15px;font-weight:300;
-  letter-spacing:-.005em;
-}
-.lede strong{color:var(--d-ink);font-weight:500}
-
-/* ---------- artifact ---------- */
-.artifact{
-  position:relative;height:290px;margin:46px 0 42px;
-  display:flex;align-items:center;justify-content:center;
-  perspective:1400px;
-}
-.sheet{
-  position:absolute;width:196px;height:250px;
-  background:#fdfcfb;
-  border-radius:2px;
-  padding:18px 17px;
-  box-shadow:0 30px 60px -12px rgba(0,0,0,.75), 0 2px 6px rgba(0,0,0,.4);
-  display:flex;flex-direction:column;
-}
-.sheet-num{
-  font-family:var(--display);font-size:34px;line-height:1;
-  color:var(--accent);margin-bottom:2px;
-}
-.sheet-tag{
-  font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;
-  color:#8b837b;margin-bottom:14px;
-}
-.sheet-rule{height:1px;background:#e8e4e0;margin-bottom:14px}
-.sheet-head{
-  height:8px;background:#241f1a;border-radius:1px;margin-bottom:11px;width:78%;
-}
-.sheet-line{height:4px;background:#dcd7d2;border-radius:1px;margin-bottom:7px}
-.sheet-line.w95{width:95%}.sheet-line.w88{width:88%}.sheet-line.w80{width:80%}
-.sheet-line.w72{width:72%}.sheet-line.w64{width:64%}.sheet-line.w52{width:52%}
-.sheet-chip{
-  margin-top:auto;font-family:var(--mono);font-size:7px;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--accent);
-  border:1px solid var(--accent-line);background:var(--accent-soft);
-  padding:4px 7px;border-radius:2px;align-self:flex-start;
-}
-.sheet-a{transform:rotate(-9deg) translateX(-142px) translateY(10px) scale(.9);opacity:.5}
-.sheet-c{transform:rotate(9deg) translateX(142px) translateY(10px) scale(.9);opacity:.5}
-.sheet-b{
-  z-index:3;width:215px;height:272px;
-  border-top:3px solid var(--accent);
-  box-shadow:0 40px 80px -14px rgba(0,0,0,.9), 0 0 0 1px rgba(255,90,60,.25);
-  animation:drift 7s ease-in-out infinite;
-}
-@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
 .q-sub{
   font-family:var(--mono);font-size:12px;letter-spacing:.06em;
@@ -769,21 +696,16 @@ h1 .hollow{
   .opt{height:54px;font-size:24px}
   .anchor{font-size:15px;margin-top:18px}
   .nav-hint{display:none}
-  .artifact{height:230px;margin:38px 0 34px}
-  .sheet{width:142px;height:190px;padding:14px 13px}
-  .sheet-b{width:158px;height:206px}
-  .sheet-a{transform:rotate(-9deg) translateX(-94px) translateY(8px) scale(.88)}
-  .sheet-c{transform:rotate(9deg) translateX(94px) translateY(8px) scale(.88)}
 }
 </style>
 </head>
-<body class="hero-mode">
+<body>
 
 <div class="progress-rail"><div class="progress-fill" id="prog"></div></div>
 
 <div class="stage">
   <div class="topbar">
-    <div class="mark">BOBBY <em>JARVIS JR</em></div>
+    <a class="mark" href="https://www.bobbyjarvisjr.com" style="text-decoration:none;">BOBBY <em>JARVIS JR</em></a>
     <div class="counter" id="counter"></div>
   </div>
 
@@ -791,52 +713,8 @@ h1 .hollow{
     <div class="panel-inner">
       <div class="err" id="err"></div>
 
-      <!-- INTRO -->
-      <section class="screen active" id="screen-intro">
-        <div class="hero-eyebrow">Free<span>&nbsp;&middot;&nbsp;</span>3 minutes<span>&nbsp;&middot;&nbsp;</span>Built from your answers</div>
-        <h1>Get your free<br>personalised<br><span class="hollow">Practice Pathway.</span></h1>
-        <p class="lede">The number one problem most players have is not knowing what to practise.</p>
-        <p class="lede">Fill in this questionnaire and I'll build you a pathway: what's holding you back, and what to work on first.</p>
-
-        <div class="artifact" aria-hidden="true">
-          <div class="sheet sheet-a">
-            <div class="sheet-num">02</div>
-            <div class="sheet-tag">Then this</div>
-            <div class="sheet-rule"></div>
-            <div class="sheet-head"></div>
-            <div class="sheet-line w88"></div>
-            <div class="sheet-line w95"></div>
-            <div class="sheet-line w64"></div>
-            <div class="sheet-chip">Triads</div>
-          </div>
-          <div class="sheet sheet-b">
-            <div class="sheet-num">01</div>
-            <div class="sheet-tag">Fix this first</div>
-            <div class="sheet-rule"></div>
-            <div class="sheet-head"></div>
-            <div class="sheet-line w95"></div>
-            <div class="sheet-line w80"></div>
-            <div class="sheet-line w88"></div>
-            <div class="sheet-line w52"></div>
-            <div class="sheet-chip">Neck navigation</div>
-          </div>
-          <div class="sheet sheet-c">
-            <div class="sheet-num">03</div>
-            <div class="sheet-tag">Then this</div>
-            <div class="sheet-rule"></div>
-            <div class="sheet-head"></div>
-            <div class="sheet-line w72"></div>
-            <div class="sheet-line w88"></div>
-            <div class="sheet-line w64"></div>
-            <div class="sheet-chip">Phrasing</div>
-          </div>
-        </div>
-
-        <button class="btn" id="start">Build my pathway →</button>
-      </section>
-
       <!-- SETUP -->
-      <section class="screen" id="screen-setup">
+      <section class="screen active" id="screen-setup">
         <div class="q-section">How this works</div>
         <div class="q-text">Rate yourself,<br>honestly.</div>
         <p class="setup-lede">I'm going to ask you some questions about different parts of your playing. For each one, give yourself a score out of six.</p>
@@ -1183,13 +1061,6 @@ function goCapture(){
   window.scrollTo({ top:0, behavior:'instant' });
   idx = queue.length; // past the end
 }
-
-document.getElementById('start').addEventListener('click', () => {
-  document.body.classList.remove('hero-mode');
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-setup').classList.add('active');
-  window.scrollTo({ top:0, behavior:'instant' });
-});
 
 document.getElementById('begin').addEventListener('click', () => {
   rebuildQueue();
