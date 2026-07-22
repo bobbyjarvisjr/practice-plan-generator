@@ -344,12 +344,372 @@ h1 .hollow{
 }
 .err.on{display:block}
 
-/* results */
+/* ============================================================
+   RESULTS
+   ============================================================ */
 .results{display:none}
-.results.on{display:block}
+.results.on{display:block;animation:rise .4s cubic-bezier(.2,.8,.2,1)}
+
+/* wider than the questionnaire — the plan needs room to breathe */
+.results.on{margin-left:calc(-1 * clamp(0px,4vw,60px));margin-right:calc(-1 * clamp(0px,4vw,60px))}
+
+/* ---------- masthead ---------- */
+.r-mast{
+  padding-bottom:44px;margin-bottom:8px;
+  border-bottom:3px solid var(--ink);
+}
+.r-eyebrow{
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:22px;
+}
+.r-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block}
+.r-headline{
+  font-family:var(--display);
+  font-size:clamp(38px,7.4vw,72px);
+  line-height:.93;letter-spacing:.008em;text-transform:uppercase;
+  color:var(--ink);max-width:19ch;
+}
+
+/* ---------- generic block ---------- */
+.r-block{padding-top:46px;margin-top:46px;border-top:1px solid var(--line)}
+.r-block--first{border-top:0;margin-top:0;padding-top:40px}
+
+.r-label{
+  display:flex;align-items:center;gap:11px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:24px;
+}
+.r-label::after{
+  content:'';flex:1;height:1px;background:var(--line-soft);
+}
+.r-prose p{
+  font-size:18px;line-height:1.68;color:var(--ink-dim);font-weight:300;
+  max-width:56ch;margin-bottom:18px;
+}
+.r-prose p:first-child{
+  font-size:20.5px;line-height:1.58;color:var(--ink);font-weight:400;
+}
+.r-prose p:last-child{margin-bottom:0}
+
+/* ---------- weak areas — as a data table, not prose ---------- */
+.r-weak{margin-top:36px}
+.r-weak-row{
+  display:grid;
+  grid-template-columns:minmax(120px,190px) 1fr;
+  gap:0 32px;
+  padding:22px 0;
+  border-top:1px solid var(--line-soft);
+}
+.r-weak-row:last-child{border-bottom:1px solid var(--line-soft)}
+.r-weak-label{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--accent);line-height:1.5;padding-top:2px;
+}
+.r-weak-body p{font-size:16px;line-height:1.62;color:var(--ink-dim);font-weight:300;max-width:52ch}
+.r-weak-body p + p{
+  margin-top:7px;color:var(--ink-faint);font-size:15px;
+  padding-left:15px;border-left:2px solid var(--accent-line);
+}
+
+/* ---------- misdiagnosis — the signature block ---------- */
+.r-mis{
+  position:relative;
+  background:var(--ink);
+  border-radius:4px;
+  padding:44px 40px 40px;
+  margin-top:52px;
+  overflow:hidden;
+}
+.r-mis::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 120% at 88% -20%, rgba(255,90,60,.22), transparent 62%);
+}
+.r-mis-tag{
+  position:relative;
+  display:inline-flex;align-items:center;gap:9px;
+  color:var(--accent);
+  font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+  margin-bottom:20px;
+}
+.r-mis-tag::before{
+  content:'';width:22px;height:1px;background:var(--accent);
+}
+.r-mis p{
+  position:relative;
+  font-size:clamp(19px,2.5vw,23px);line-height:1.52;color:#f2ede7;font-weight:300;
+  max-width:46ch;margin:0;letter-spacing:-.004em;
+}
+
+/* ---------- sequence logic ---------- */
+.r-seq{
+  background:var(--raise);
+  border-left:3px solid var(--accent);
+  padding:26px 28px;border-radius:0 3px 3px 0;
+}
+.r-seq p{font-size:16.5px;line-height:1.68;color:var(--ink-dim);font-weight:300;max-width:58ch;margin:0}
+
+/* ============================================================
+   THE PATH — numbered spine
+   ============================================================ */
+.r-path{
+  position:relative;
+  margin-top:6px;
+  padding-left:78px;
+}
+/* the spine itself */
+.r-path::before{
+  content:'';position:absolute;
+  left:23px;top:12px;bottom:0;width:2px;
+  background:var(--accent);
+}
+
+.r-step{position:relative;padding-bottom:56px}
+.r-step:last-child{padding-bottom:34px}
+
+/* node on the spine */
+.r-step-node{
+  position:absolute;left:-78px;top:0;
+  width:48px;height:48px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:24px;line-height:1;
+  letter-spacing:.03em;
+  box-shadow:0 0 0 7px var(--bg), 0 6px 18px -6px rgba(255,90,60,.6);
+}
+
+.r-step-kicker{
+  font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:11px;padding-top:5px;
+}
+.r-step-title{
+  font-family:var(--display);
+  font-size:clamp(25px,3.6vw,34px);
+  line-height:1.08;letter-spacing:.014em;text-transform:uppercase;
+  color:var(--ink);margin-bottom:18px;max-width:26ch;
+}
+.r-study{
+  margin-top:26px;padding:16px 20px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:3px;display:inline-block;
+}
+.r-study-label{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);margin-bottom:7px;
+}
+.r-study-name{
+  font-family:var(--display);font-size:23px;line-height:1.05;letter-spacing:.02em;
+  text-transform:uppercase;color:var(--accent);
+}
+.r-step-why{
+  font-size:17.5px;line-height:1.66;color:var(--ink-dim);font-weight:300;
+  max-width:54ch;margin-bottom:28px;
+}
+
+/* the checkable outcome */
+.r-step-signal{
+  border-top:1px solid var(--line);
+  padding-top:20px;margin-top:4px;
+}
+.r-cell-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:10px;
+}
+.r-step-signal p{font-size:16.5px;line-height:1.62;color:var(--ink-dim);font-weight:300;margin:0;max-width:54ch}
+
+/* course section tag on a step */
+.r-step-tag{
+  display:inline-flex;align-items:center;gap:10px;
+  margin-top:22px;padding:9px 15px 9px 13px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:2px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink-dim);
+}
+.r-step-tag b{color:var(--accent);font-weight:500;letter-spacing:.1em;text-transform:uppercase;font-size:10.5px}
+.r-step-tag .tag-key{
+  font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);
+}
+
+/* unlocks — reads as the link to the next node */
+.r-unlocks{
+  display:flex;gap:12px;align-items:flex-start;
+  margin-top:24px;
+}
+.r-unlocks-arrow{
+  font-family:var(--mono);font-size:14px;color:var(--accent);line-height:1.5;flex-shrink:0;
+}
+.r-unlocks p{font-size:15px;line-height:1.6;color:var(--ink-faint);font-weight:300;max-width:50ch;margin:0}
+
+/* ---------- repertoire ---------- */
+.r-rep{border-top:1px solid var(--line)}
+.r-rep-row{
+  display:grid;grid-template-columns:auto 1fr;gap:0 26px;
+  padding:24px 0;border-bottom:1px solid var(--line);
+  align-items:start;
+}
+.r-rep-idx{
+  font-family:var(--display);font-size:20px;line-height:1;
+  color:var(--line);padding-top:6px;min-width:28px;
+}
+.r-rep-title{
+  font-family:var(--display);font-size:29px;line-height:1.02;letter-spacing:.012em;
+  text-transform:uppercase;color:var(--ink);margin-bottom:4px;
+}
+.r-rep-artist{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--ink-faint);margin-bottom:14px;
+}
+.r-rep-skill{
+  display:inline-block;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);border:1px solid var(--accent-line);background:var(--accent-soft);
+  padding:4px 9px;border-radius:2px;
+}
+.r-rep-intro{
+  font-size:16px;line-height:1.65;color:var(--ink-dim);font-weight:300;
+  max-width:52ch;margin:-8px 0 26px;
+}
+.r-rep-meta{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.r-rep-mc{
+  display:inline-block;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  color:var(--ink-faint);border:1px solid var(--line);
+  padding:4px 10px;border-radius:2px;
+}
+.r-rep-mc b{color:var(--ink-dim);font-weight:500;text-transform:uppercase;letter-spacing:.13em}
+
+/* ============================================================
+   THE CLOSE — final node on the same spine
+   ============================================================ */
+.r-final{
+  position:relative;
+  margin-top:8px;
+  padding-left:78px;
+}
+.r-final::before{
+  content:'';position:absolute;
+  left:23px;top:-90px;height:114px;width:2px;
+  background:linear-gradient(to bottom,var(--accent),var(--ink));
+}
+.r-final-node{
+  position:absolute;left:0;top:0;
+  width:48px;height:48px;border-radius:50%;
+  background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-size:24px;line-height:1;letter-spacing:.03em;
+  box-shadow:0 0 0 7px var(--bg), 0 6px 18px -6px rgba(0,0,0,.4);
+}
+.r-close{
+  position:relative;
+  background:var(--ink);border-radius:4px;
+  padding:46px 42px 40px;
+  overflow:hidden;
+}
+.r-close::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 100% at 100% 0%, rgba(255,90,60,.16), transparent 60%);
+}
+.r-close > *{position:relative}
+
+.r-course-kicker{
+  font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:14px;
+}
+.r-course-head{
+  font-family:var(--display);
+  font-size:clamp(32px,5vw,48px);
+  line-height:.98;letter-spacing:.012em;text-transform:uppercase;
+  color:#fff;margin-bottom:24px;max-width:17ch;
+}
+.r-close-head p{
+  font-size:17px;line-height:1.68;color:#cfc8c1;font-weight:300;
+  max-width:54ch;margin:0;
+}
+.r-close-head p em{color:var(--accent);font-style:normal;font-weight:400}
+
+/* the two products */
+.r-prod{
+  display:grid;grid-template-columns:auto 1fr;gap:0 22px;
+  padding:32px 0;border-top:1px solid rgba(255,255,255,.15);
+  margin-top:34px;
+}
+.r-prod + .r-prod{margin-top:0}
+.r-prod-num{
+  font-family:var(--display);font-size:19px;line-height:1;
+  color:var(--accent);padding-top:6px;letter-spacing:.1em;
+}
+.r-prod-name{
+  font-family:var(--display);font-size:clamp(25px,3.4vw,32px);
+  line-height:1.04;letter-spacing:.014em;text-transform:uppercase;
+  color:#fff;margin-bottom:6px;
+}
+.r-prod-spec{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+.r-prod-body p{
+  font-size:16.5px;line-height:1.66;color:#cfc8c1;font-weight:300;
+  max-width:52ch;margin-bottom:20px;
+}
+.r-prod-sections{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 22px}
+.r-prod-chip{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:#e6e0da;border:1px solid rgba(255,255,255,.28);
+  padding:6px 11px;border-radius:2px;
+}
+
+.r-cta{
+  display:inline-flex;align-items:center;gap:12px;
+  font-family:var(--display);font-size:19px;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--accent);color:#fff;text-decoration:none;
+  padding:16px 30px;border-radius:2px;
+  transition:transform .15s,filter .15s,box-shadow .15s;
+  box-shadow:0 10px 30px -12px rgba(255,90,60,.7);
+}
+.r-cta:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.r-cta:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.r-cta-ghost{
+  background:transparent;color:#f2ede7;
+  border:1px solid rgba(255,255,255,.38);box-shadow:none;
+}
+.r-cta-ghost:hover{background:rgba(255,255,255,.07);box-shadow:none}
+
+.r-close-foot{
+  margin-top:14px;padding-top:32px;border-top:1px solid rgba(255,255,255,.15);
+}
+.r-course-hard{
+  border-left:2px solid var(--accent);padding-left:20px;
+  color:#e6e0da;font-size:17px;line-height:1.66;font-weight:300;
+  max-width:54ch;margin:0;
+}
+.r-course-foot{
+  margin-top:24px;font-size:14.5px;line-height:1.62;
+  color:#8e857c;font-weight:300;max-width:48ch;
+}
+.r-final-node{font-size:20px!important}
+
+.r-foot{
+  margin-top:40px;padding-top:24px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;line-height:1.7;
+  color:var(--ink-faint);max-width:52ch;
+}
 
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
+}
+@media (max-width:760px){
+  .results.on{margin-left:0;margin-right:0}
+  .r-path,.r-final{padding-left:56px}
+  .r-path::before{left:17px}
+  .r-final::before{left:17px}
+  .r-step-node,.r-final-node{width:36px;height:36px;font-size:19px;box-shadow:0 0 0 6px var(--bg)}
+  .r-step-node{left:-56px}
+  .r-weak-row{grid-template-columns:1fr;gap:10px 0}
+  .r-mis{padding:34px 26px 30px}
+  .r-close{padding:34px 24px 32px}
+  .r-prod{grid-template-columns:1fr;gap:0}
+  .r-prod-num{display:none}
+  .r-rep-row{grid-template-columns:1fr;gap:0}
+  .r-rep-idx{display:none}
 }
 @media (max-width:620px){
   .scale{gap:6px}
@@ -505,7 +865,8 @@ const SECTIONS = [
     { name:'bar_chords',       text:'Barre chords' }
   ]},
   { id:'navigation', label:'Navigation', questions:[
-    { name:'root_notes', text:'Finding root notes on the neck' }
+    { name:'root_notes', text:'Finding root notes on the neck' },
+    { name:'harmonized_major_scale', text:'Knowing the chords in a key' }
   ]},
   { id:'triads', label:'Triads',
     unlock:s => s.major_scale >= 3,
@@ -515,23 +876,26 @@ const SECTIONS = [
       { name:'diminished_triads', text:'Diminished triads' }
   ]},
   { id:'chords', label:'Chords & Harmony',
-    unlock:s => s.bar_chords >= 2,
+    unlock:s => s.bar_chords >= 3,
     questions:[
       { name:'major_chords', text:'Major chord shapes (CAGED)' },
       { name:'minor_chords', text:'Minor chord shapes (CAGED)' },
       { name:'seventh_chords', text:'7th chord shapes', sub:'Major 7, minor 7, dominant 7, minor 7 flat 5' }
   ]},
   { id:'arpeggios', label:'Arpeggios',
-    unlock:s => s.major_triads >= 2 || s.minor_triads >= 2,
+    unlock:s => s.major_triads >= 3 || s.minor_triads >= 3,
     questions:[
       { name:'major_arps', text:'Major arpeggios' },
       { name:'minor_arps', text:'Minor arpeggios' }
   ]},
-  { id:'advanced', label:'Advanced Harmony',
-    unlock:s => s.major_arps >= 2 || s.minor_arps >= 2,
+  { id:'seventh_arps', label:'7th Arpeggios',
+    unlock:s => s.major_arps >= 3 || s.minor_arps >= 3,
     questions:[
-      { name:'seventh_arps', text:'7th arpeggios', sub:'Major 7, minor 7, dominant 7, minor 7 flat 5' },
-      { name:'harmonized_major_scale', text:'Knowing the chords in a key' },
+      { name:'seventh_arps', text:'7th arpeggios', sub:'Major 7, minor 7, dominant 7, minor 7 flat 5' }
+  ]},
+  { id:'harmony', label:'Harmony',
+    unlock:s => s.harmonized_major_scale >= 3,
+    questions:[
       { name:'chord_targeting', text:'Chord-tone targeting' },
       { name:'modes', text:'Modes' }
   ]},
@@ -567,9 +931,9 @@ const GOALS = [
 
 const SCALE_FIELDS = ['minor_pentatonic','major_pentatonic','major_scale','bar_chords','modes'];
 const TRIAD_FIELDS = ['major_triads','minor_triads','diminished_triads'];
-const CHORD_FIELDS = ['major_chords','minor_chords','seventh_chords','harmonized_major_scale','chord_targeting'];
+const CHORD_FIELDS = ['major_chords','minor_chords','seventh_chords','chord_targeting'];
 const ARP_FIELDS   = ['major_arps','minor_arps','seventh_arps'];
-const NAV_FIELDS   = ['root_notes'];
+const NAV_FIELDS   = ['root_notes','harmonized_major_scale'];
 
 /* ============ STATE ============ */
 const scores = {};
@@ -860,7 +1224,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     const data = await res.json();
     clearInterval(cycle);
     loadingEl.classList.remove('on');
-    resultsEl.innerHTML = data.plan;
+    resultsEl.innerHTML = renderPathway(data, name);
     resultsEl.classList.add('on');
     window.scrollTo({ top:0, behavior:'instant' });
   } catch (err){
@@ -871,6 +1235,170 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     document.getElementById('screen-capture').classList.add('active');
   }
 });
+
+/* ============================================================
+   RESULTS RENDERER
+   ============================================================ */
+
+const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library';
+const PHRASING_URL = 'https://www.bobbyjarvisjr.com/products/pentatonic-phrasing-course';
+
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function pad(n){ return String(n).padStart(2,'0'); }
+
+/* Turns "para one\n\npara two" into <p> tags. */
+function paras(s){
+  if (!s) return '';
+  return String(s).split(/\n\s*\n/)
+    .map(p => p.trim())
+    .filter(Boolean)
+    .map(p => '<p>' + esc(p).replace(/\n/g,'<br>') + '</p>')
+    .join('');
+}
+
+function renderWeakAreas(list){
+  if (!list || !list.length) return '';
+  return '<div class="r-weak">' + list.map(w => `
+    <div class="r-weak-row">
+      <div class="r-weak-label">${esc(w.label)}</div>
+      <div class="r-weak-body">
+        ${w.evidence ? `<p>${esc(w.evidence)}</p>` : ''}
+        ${w.consequence ? `<p>${esc(w.consequence)}</p>` : ''}
+      </div>
+    </div>`).join('') + '</div>';
+}
+
+function renderSlot(rec, n, title){
+  if (!rec) return '';
+  return `
+    <div class="r-step">
+      <div class="r-step-node">${pad(n)}</div>
+      <div class="r-step-kicker">${esc(title)}</div>
+      ${rec.lead ? `<div class="r-step-title">${esc(rec.lead)}</div>` : ''}
+      ${rec.body ? `<div class="r-step-why">${esc(rec.body)}</div>` : ''}
+      ${rec.section ? `
+      <div class="r-study">
+        <div class="r-study-label">Recommended study material</div>
+        <div class="r-study-name">${esc(rec.section)}</div>
+      </div>` : ''}
+    </div>`;
+}
+
+function renderProduct(n, name, spec, body, url, cta, ghost, chips){
+  return `
+    <div class="r-prod">
+      <div class="r-prod-num">${pad(n)}</div>
+      <div class="r-prod-body">
+        <div class="r-prod-name">${esc(name)}</div>
+        <div class="r-prod-spec">${esc(spec)}</div>
+        <p>${body}</p>
+        ${chips || ''}
+        <a class="r-cta${ghost ? ' r-cta-ghost' : ''}" href="${url}">${esc(cta)} &rarr;</a>
+      </div>
+    </div>`;
+}
+
+function renderCourse(data){
+  const named = data.sections_named || [];
+  const one = named.length === 1;
+  const courseUrl = data.course_url || COURSE_URL;
+  const phrasingUrl = data.phrasing_url || PHRASING_URL;
+  const guide = data.free_guide;
+
+  const chips = named.length ? `
+    <div class="r-prod-sections">
+      ${named.map(s => `<span class="r-prod-chip">${esc(s)}</span>`).join('')}
+    </div>` : '';
+
+  let n = 0;
+
+  return `
+    <div class="r-final">
+      <div class="r-final-node">&rarr;</div>
+      <div class="r-close">
+
+        <div class="r-close-head">
+          <div class="r-course-kicker">Where all this is taught</div>
+          <div class="r-course-head">Now go and actually do it</div>
+          <p>Everything above tells you <em>what</em>. It doesn't tell you <em>how</em>.
+             That's the part that takes hours at the guitar with someone showing you
+             &mdash; and it's the part I've already filmed.</p>
+        </div>
+
+        ${guide ? renderProduct(++n, guide.title, guide.spec, esc(guide.body),
+            guide.url, 'Download the guide', true) : ''}
+
+        ${renderProduct(++n, 'The Complete Course Library', '16 masterclasses &middot; 30 hours',
+            `Neck navigation through to modes, triads, extended chords and full song
+             studies. ${named.length ? `The ${one ? 'section' : 'sections'} above ${one ? 'lives' : 'live'} in here &mdash; you get the whole library, not just ${one ? 'that one' : 'those two'}.` : ''}`,
+            courseUrl, 'Get the Complete Library', false, chips)}
+
+        ${data.phrasing ? renderProduct(++n, 'Pentatonic Phrasing', 'The application course',
+            `The Library gives you the material. This one is what you do with it
+             &mdash; phrasing, space, and building a solo that goes somewhere instead
+             of running shapes.`,
+            phrasingUrl, 'Get Pentatonic Phrasing', true) : ''}
+
+        <div class="r-close-foot">
+          <p class="r-course-hard">You'd spend double this on a pedal you'll be bored of
+             in a fortnight. This lasts years.</p>
+          <div class="r-course-foot">Or don't &mdash; the plan above is yours either way,
+            and it works if you work it.</div>
+        </div>
+
+      </div>
+    </div>`;
+}
+
+function renderPathway(data, name){
+  if (!data || !data.assessment){
+    return '<div class="r-prose"><p>Something went wrong building your pathway. ' +
+           'Have another go, or email me and I\'ll sort it.</p></div>';
+  }
+
+  const a = data.assessment || {};
+  const first = (name || '').split(' ')[0];
+
+  return `
+    <div class="r-mast">
+      <div class="r-eyebrow">
+        <span class="dot"></span>
+        <span>${first ? esc(first) + ' &mdash; your practice pathway' : 'Your practice pathway'}</span>
+      </div>
+      <div class="r-headline">${esc(data.headline)}</div>
+    </div>
+
+    ${a.overview ? `
+    <div class="r-block r-block--first">
+      <div class="r-label">Where you are</div>
+      <div class="r-prose">${paras(a.overview)}</div>
+      ${renderWeakAreas(a.weak_areas)}
+    </div>` : ''}
+
+    ${a.misdiagnosis ? `
+    <div class="r-mis">
+      <div class="r-mis-tag">Read this twice</div>
+      <p>${esc(a.misdiagnosis)}</p>
+    </div>` : ''}
+
+    <div class="r-block">
+      <div class="r-label">Your pathway</div>
+      <div class="r-path">
+        ${renderSlot(data.good_stuff, 1, (data.slot_titles||{}).good_stuff || 'Fretboard navigation')}
+        ${renderSlot(data.theory, 2, (data.slot_titles||{}).theory || 'Theory')}
+        ${renderSlot(data.phrasing, 3, (data.slot_titles||{}).phrasing || 'Application')}
+      </div>
+    </div>
+
+    ${renderCourse(data)}
+
+    <div class="r-foot">A copy of this is in your inbox. If it's not there in a few minutes, check your spam folder.</div>`;
+}
+
 </script>
 </body>
 </html>
