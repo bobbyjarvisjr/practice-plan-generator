@@ -29,6 +29,7 @@
   --display:'Bebas Neue',Impact,sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,monospace;
   --body:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%}
@@ -40,6 +41,7 @@ body{
   overflow-x:hidden;
   transition:background .5s ease;
 }
+::selection{background:var(--accent);color:#fff}
 /* dark mode applies ONLY while the hero is showing */
 body.hero-mode{background:var(--d-bg);color:var(--d-ink)}
 body.hero-mode::before{
@@ -55,7 +57,8 @@ body.hero-mode::before{
 body.hero-mode .progress-rail{background:transparent}
 .progress-fill{
   height:100%;width:0%;background:var(--accent);
-  transition:width .45s cubic-bezier(.2,.8,.2,1);
+  transition:width .45s var(--ease);
+  box-shadow:0 0 12px rgba(255,90,60,.45);
 }
 
 /* ---------- shell ---------- */
@@ -85,11 +88,17 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
 
 /* ---------- screens ---------- */
 .screen{display:none!important}
-.screen.active{display:block!important;animation:rise .34s cubic-bezier(.2,.8,.2,1)}
+.screen.active{display:block!important;animation:rise .34s var(--ease)}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
 /* ---------- hero ---------- */
 #screen-intro{text-align:left}
+.hero-eyebrow{
+  display:flex;align-items:center;gap:14px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:26px;
+}
+.hero-eyebrow::after{content:'';width:44px;height:1px;background:var(--d-line)}
 h1{
   font-family:var(--display);
   font-size:clamp(50px,9.5vw,98px);
@@ -97,6 +106,7 @@ h1{
   text-transform:uppercase;
   margin-bottom:28px;
   color:var(--d-ink);
+  text-wrap:balance;
 }
 h1 .hollow{
   color:transparent;
@@ -149,8 +159,11 @@ h1 .hollow{
 .sheet-c{transform:rotate(9deg) translateX(142px) translateY(10px) scale(.9);opacity:.5}
 .sheet-b{
   z-index:3;width:215px;height:272px;
+  border-top:3px solid var(--accent);
   box-shadow:0 40px 80px -14px rgba(0,0,0,.9), 0 0 0 1px rgba(255,90,60,.25);
+  animation:drift 7s ease-in-out infinite;
 }
+@keyframes drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
 .q-sub{
   font-family:var(--mono);font-size:12px;letter-spacing:.06em;
@@ -207,6 +220,7 @@ h1 .hollow{
   font-size:clamp(32px,5.6vw,52px);
   line-height:1.02;letter-spacing:.012em;text-transform:uppercase;
   margin-bottom:30px;color:var(--ink);
+  text-wrap:balance;
 }
 .q-hint{
   font-size:15px;color:var(--ink-dim);margin-bottom:34px;font-weight:300;line-height:1.6;
@@ -226,11 +240,15 @@ h1 .hollow{
   height:66px;cursor:pointer;
   font-family:var(--display);font-size:30px;line-height:1;
   color:var(--ink-faint);
-  transition:border-color .13s,background .13s,color .13s,transform .13s;
+  transition:border-color .13s,background .13s,color .13s,transform .13s,box-shadow .13s;
 }
 .opt:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-3px)}
 .opt input{position:absolute;opacity:0;pointer-events:none}
-.opt.chosen{background:var(--accent);border-color:var(--accent);color:#fff}
+.opt.chosen{
+  background:var(--accent);border-color:var(--accent);color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px -10px rgba(255,90,60,.6);
+}
 .opt:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
 .scale-ends{
@@ -241,11 +259,12 @@ h1 .hollow{
 .anchor{
   margin-top:22px;min-height:46px;
   display:flex;align-items:center;
-  border-left:2px solid var(--line);padding-left:15px;
+  border-left:2px solid var(--line);padding:10px 15px;
   font-size:16px;color:var(--ink-faint);
-  transition:color .15s,border-color .15s;
+  border-radius:0 3px 3px 0;
+  transition:color .15s,border-color .15s,background .15s;
 }
-.anchor.live{color:var(--ink);border-left-color:var(--accent)}
+.anchor.live{color:var(--ink);border-left-color:var(--accent);background:var(--accent-soft)}
 .anchor b{font-family:var(--mono);font-size:12px;color:var(--accent);margin-right:11px;letter-spacing:.1em}
 
 /* checkboxes */
@@ -293,7 +312,8 @@ h1 .hollow{
   background:var(--accent);color:#fff;border:0;border-radius:2px;
   padding:16px 34px;cursor:pointer;
   display:inline-flex;align-items:center;gap:11px;
-  transition:transform .15s,filter .15s;
+  transition:transform .15s,filter .15s,box-shadow .15s;
+  box-shadow:0 10px 26px -12px rgba(255,90,60,.55);
 }
 .btn:hover{filter:brightness(1.07);transform:translateY(-2px)}
 .btn:active{transform:none}
@@ -301,7 +321,7 @@ h1 .hollow{
 .btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .btn-ghost{
   background:transparent;color:var(--ink-faint);
-  border:1px solid var(--line);padding:15px 24px;
+  border:1px solid var(--line);padding:15px 24px;box-shadow:none;
 }
 .btn-ghost:hover{color:var(--ink);border-color:var(--ink-faint);filter:none}
 
@@ -348,10 +368,15 @@ h1 .hollow{
    RESULTS
    ============================================================ */
 .results{display:none}
-.results.on{display:block;animation:rise .4s cubic-bezier(.2,.8,.2,1)}
+.results.on{display:block;animation:rise .4s var(--ease)}
 
 /* wider than the questionnaire — the plan needs room to breathe */
 .results.on{margin-left:calc(-1 * clamp(0px,4vw,60px));margin-right:calc(-1 * clamp(0px,4vw,60px))}
+
+/* scroll reveals — classes added by JS only, so no-JS still shows everything */
+.js-reveal{opacity:0;transform:translateY(20px);
+  transition:opacity .65s var(--ease),transform .65s var(--ease)}
+.js-reveal.in{opacity:1;transform:none}
 
 /* ---------- masthead ---------- */
 .r-mast{
@@ -369,7 +394,15 @@ h1 .hollow{
   font-size:clamp(38px,7.4vw,72px);
   line-height:.93;letter-spacing:.008em;text-transform:uppercase;
   color:var(--ink);max-width:19ch;
+  text-wrap:balance;
 }
+.r-meta{
+  display:flex;gap:10px 26px;flex-wrap:wrap;margin-top:26px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-faint);
+}
+.r-meta b{color:var(--ink);font-weight:500}
+.r-meta .sep{color:var(--accent)}
 
 /* ---------- generic block ---------- */
 .r-block{padding-top:46px;margin-top:46px;border-top:1px solid var(--line)}
@@ -417,6 +450,7 @@ h1 .hollow{
   position:relative;
   background:var(--ink);
   border-radius:4px;
+  border-top:3px solid var(--accent);
   padding:44px 40px 40px;
   margin-top:52px;
   overflow:hidden;
@@ -450,7 +484,7 @@ h1 .hollow{
 .r-seq p{font-size:16.5px;line-height:1.68;color:var(--ink-dim);font-weight:300;max-width:58ch;margin:0}
 
 /* ============================================================
-   THE PATH — numbered spine
+   THE PATH — numbered spine that draws itself in
    ============================================================ */
 .r-path{
   position:relative;
@@ -462,6 +496,18 @@ h1 .hollow{
   content:'';position:absolute;
   left:23px;top:12px;bottom:0;width:2px;
   background:var(--accent);
+  transform-origin:top;
+}
+/* JS arms the draw; observer fires it */
+.r-path.js-draw::before{transform:scaleY(0)}
+.r-path.js-draw.in::before{
+  transform:scaleY(1);
+  transition:transform 1.2s var(--ease) .1s;
+}
+.r-path.js-draw .r-step-node{transform:scale(0);opacity:0}
+.r-path.js-draw .r-step.in .r-step-node{
+  transform:scale(1);opacity:1;
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1) .25s,opacity .3s ease .25s;
 }
 
 .r-step{position:relative;padding-bottom:56px}
@@ -487,10 +533,12 @@ h1 .hollow{
   font-size:clamp(25px,3.6vw,34px);
   line-height:1.08;letter-spacing:.014em;text-transform:uppercase;
   color:var(--ink);margin-bottom:18px;max-width:26ch;
+  text-wrap:balance;
 }
 .r-study{
   margin-top:26px;padding:16px 20px;
   background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-left:3px solid var(--accent);
   border-radius:3px;display:inline-block;
 }
 .r-study-label{
@@ -601,6 +649,7 @@ h1 .hollow{
 .r-close{
   position:relative;
   background:var(--ink);border-radius:4px;
+  border-top:3px solid var(--accent);
   padding:46px 42px 40px;
   overflow:hidden;
 }
@@ -619,6 +668,7 @@ h1 .hollow{
   font-size:clamp(32px,5vw,48px);
   line-height:.98;letter-spacing:.012em;text-transform:uppercase;
   color:#fff;margin-bottom:24px;max-width:17ch;
+  text-wrap:balance;
 }
 .r-close-head p{
   font-size:17px;line-height:1.68;color:#cfc8c1;font-weight:300;
@@ -626,7 +676,7 @@ h1 .hollow{
 }
 .r-close-head p em{color:var(--accent);font-style:normal;font-weight:400}
 
-/* the two products */
+/* the products */
 .r-prod{
   display:grid;grid-template-columns:auto 1fr;gap:0 22px;
   padding:32px 0;border-top:1px solid rgba(255,255,255,.15);
@@ -653,7 +703,7 @@ h1 .hollow{
 .r-prod-sections{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 22px}
 .r-prod-chip{
   font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  color:#e6e0da;border:1px solid rgba(255,255,255,.28);
+  color:#ffcabd;border:1px solid rgba(255,90,60,.45);background:rgba(255,90,60,.08);
   padding:6px 11px;border-radius:2px;
 }
 
@@ -695,6 +745,9 @@ h1 .hollow{
 
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
+  .js-reveal{opacity:1!important;transform:none!important}
+  .r-path.js-draw::before{transform:scaleY(1)!important}
+  .r-path.js-draw .r-step-node{transform:scale(1)!important;opacity:1!important}
 }
 @media (max-width:760px){
   .results.on{margin-left:0;margin-right:0}
@@ -740,6 +793,7 @@ h1 .hollow{
 
       <!-- INTRO -->
       <section class="screen active" id="screen-intro">
+        <div class="hero-eyebrow">Free<span>&nbsp;&middot;&nbsp;</span>3 minutes<span>&nbsp;&middot;&nbsp;</span>Built from your answers</div>
         <h1>Get your free<br>personalised<br><span class="hollow">Practice Pathway.</span></h1>
         <p class="lede">The number one problem most players have is not knowing what to practise.</p>
         <p class="lede">Fill in this questionnaire and I'll build you a pathway: what's holding you back, and what to work on first.</p>
@@ -1226,6 +1280,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     loadingEl.classList.remove('on');
     resultsEl.innerHTML = renderPathway(data, name);
     resultsEl.classList.add('on');
+    initReveals();
     window.scrollTo({ top:0, behavior:'instant' });
   } catch (err){
     clearInterval(cycle);
@@ -1241,7 +1296,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
    ============================================================ */
 
 const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library';
-const PHRASING_URL = 'https://www.bobbyjarvisjr.com/products/pentatonic-phrasing-course';
+const PHRASING_URL = 'https://www.bobbyjarvisjr.com/products/pentatonic-phrasing-challenge-complete-4-week-series';
 
 function esc(s){
   return String(s == null ? '' : s)
@@ -1362,6 +1417,7 @@ function renderPathway(data, name){
 
   const a = data.assessment || {};
   const first = (name || '').split(' ')[0];
+  const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
 
   return `
     <div class="r-mast">
@@ -1370,6 +1426,13 @@ function renderPathway(data, name){
         <span>${first ? esc(first) + ' &mdash; your practice pathway' : 'Your practice pathway'}</span>
       </div>
       <div class="r-headline">${esc(data.headline)}</div>
+      <div class="r-meta">
+        <span>Self-assessment</span>
+        <span class="sep">&middot;</span>
+        <span><b>${esc(dateStr)}</b></span>
+        <span class="sep">&middot;</span>
+        <span>Built from your answers</span>
+      </div>
     </div>
 
     ${a.overview ? `
@@ -1397,6 +1460,43 @@ function renderPathway(data, name){
     ${renderCourse(data)}
 
     <div class="r-foot">A copy of this is in your inbox. If it's not there in a few minutes, check your spam folder.</div>`;
+}
+
+/* ============================================================
+   SCROLL REVEALS — the pathway draws itself in
+   Classes are only added here, so no-JS / old browsers / reduced
+   motion all see the full page instantly.
+   ============================================================ */
+function initReveals(){
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+
+  const blocks = resultsEl.querySelectorAll('.r-block, .r-mis, .r-final, .r-foot');
+  blocks.forEach(b => b.classList.add('js-reveal'));
+
+  const path = resultsEl.querySelector('.r-path');
+  if (path) path.classList.add('js-draw');
+
+  const steps = resultsEl.querySelectorAll('.r-step');
+  steps.forEach((s, i) => {
+    s.classList.add('js-reveal');
+    s.style.transitionDelay = (i * 110) + 'ms';
+  });
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      if (e.target.classList.contains('r-step')){
+        const p = e.target.closest('.r-path');
+        if (p) p.classList.add('in');
+      }
+      io.unobserve(e.target);
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+  blocks.forEach(b => io.observe(b));
+  steps.forEach(s => io.observe(s));
 }
 
 </script>
