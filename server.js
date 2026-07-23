@@ -19,7 +19,6 @@ const anthropic = new Anthropic({
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library-pack';
-const PHRASING_URL = 'https://www.bobbyjarvisjr.com/products/pentatonic-phrasing-challenge-complete-4-week-series';
 const FROM_EMAIL = 'jarvis@bobbyjarvisjr.com';
 // Shopify customer creation — pick ONE route via env vars in Vercel:
 //   Route A (Zapier):     set ZAPIER_HOOK_URL to a "Catch Hook" URL; the zap's
@@ -301,9 +300,11 @@ function buildRecommendation(flatScores) {
     theory: RECOMMENDATIONS[theory],
     phrasing: PHRASING[phrasing],
     // Sections named from the Complete Library, in course order, for the close.
+    // Sections named from the Complete Library, in course order, plus the
+    // phrasing section (now folded into the Library), for the close.
     sections_named: COURSE_SECTIONS.filter(function (sec) {
       return sec === RECOMMENDATIONS[good].section || sec === RECOMMENDATIONS[theory].section;
-    })
+    }).concat([PHRASING[phrasing].section])
   };
 }
 
@@ -615,7 +616,7 @@ function buildEmailHTML(name, plan) {
       : '<td style="background:' + accent + ';">' +
         '<a href="' + url + '" style="display:inline-block;padding:15px 30px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:1px;font-size:15px;color:#ffffff;text-decoration:none;">' + escHtml(cta) + ' &rarr;</a></td>';
     return (
-      '<div style="' + mono + 'font-size:11px;color:' + accent + ';margin:0 0 6px;">' + num + '</div>' +
+      (num ? '<div style="' + mono + 'font-size:11px;color:' + accent + ';margin:0 0 6px;">' + num + '</div>' : '') +
       '<h3 style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-transform:uppercase;font-size:20px;line-height:1.15;color:#ffffff;margin:0 0 4px;">' + escHtml(title) + '</h3>' +
       '<div style="' + mono + 'font-size:10px;color:' + accent + ';margin:0 0 12px;">' + spec + '</div>' +
       '<p style="font-family:Georgia,serif;font-size:15px;line-height:1.6;color:#cfc8c1;margin:0 0 16px;">' + blurb + '</p>' +
@@ -635,23 +636,13 @@ function buildEmailHTML(name, plan) {
     '<h2 style="' + head + 'color:#ffffff;font-size:24px;line-height:1.15;margin:0 0 14px;">Now go and actually do it</h2>' +
     '<p style="font-family:Georgia,serif;font-size:15px;line-height:1.65;color:#cfc8c1;margin:0 0 22px;">Everything above tells you <span style="color:' + accent + ';">what</span>. It doesn\'t tell you <span style="color:' + accent + ';">how</span>. That\'s the part that takes hours at the guitar with someone showing you &mdash; and it\'s the part I\'ve already filmed.</p>' +
 
-    (guide
-      ? emailProduct('01', guide.title, guide.spec,
-          'The whole picture in one read &mdash; read this first, before you spend anything.',
-          guide.url, 'Download the guide', true, '') +
-        '<div style="border-top:1px solid #3a3530;margin:0 0 24px;"></div>'
-      : '') +
-
-    emailProduct('02', 'The Complete Course Library', '16 masterclasses &middot; 30 hours',
-      'Neck navigation through to modes, triads, extended chords and full song studies. The sections above live in here &mdash; you get the whole library, not just those.',
+    emailProduct(null, 'The Complete Course Library', '21 masterclasses &middot; 40+ hours &middot; Pentatonic Phrasing included',
+      'Neck navigation through to modes, triads, extended chords and full song studies &mdash; plus the application side: phrasing, space, and building a solo that goes somewhere. Every section named above lives in here.',
       plan.course_url || '', 'Get the Complete Library', false,
       chips ? '<div style="' + mono + 'font-size:10px;color:#ffcabd;margin:0 0 16px;">Your sections: ' + chips + '</div>' : '') +
-    '<div style="border-top:1px solid #3a3530;margin:0 0 24px;"></div>' +
 
-    (plan.phrasing
-      ? emailProduct('03', 'Pentatonic Phrasing', 'The application course',
-          'The Library gives you the material. This one is what you do with it &mdash; phrasing, space, and building a solo that goes somewhere instead of running shapes.',
-          plan.phrasing_url || '', 'Get Pentatonic Phrasing', false, '')
+    (guide
+      ? '<p style="font-family:Georgia,serif;font-size:14px;line-height:1.65;color:#a89f97;margin:0 0 24px;">Oh &mdash; and take this with you: <a href="' + guide.url + '" style="color:#ffffff;">' + escHtml(guide.title) + '</a> <span style="color:#8e857c;">(' + escHtml(guide.spec) + ')</span>. The whole picture in one read.</p>'
       : '') +
 
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' +
@@ -754,7 +745,6 @@ app.post('/api/generate-plan', async function (req, res) {
     delete plan.leads;
     Object.assign(plan, rec);
     plan.course_url = COURSE_URL;
-    plan.phrasing_url = PHRASING_URL;
 
     await Promise.all([
       saveShopifyCustomer(name, email),
