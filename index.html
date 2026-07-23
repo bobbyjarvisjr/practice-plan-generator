@@ -627,6 +627,13 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
   font-size:16.5px;line-height:1.66;color:#cfc8c1;font-weight:300;
   max-width:52ch;margin-bottom:20px;
 }
+.r-prod--solo{grid-template-columns:1fr}
+.r-freebie{
+  margin:6px 0 0;padding:20px 0 8px;
+  font-size:15px;line-height:1.65;color:#a89f97;font-weight:300;max-width:52ch;
+}
+.r-freebie a{color:#fff}
+.r-freebie span{color:#8e857c}
 .r-prod-sections{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 22px}
 .r-prod-chip{
   font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
@@ -1166,8 +1173,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
    RESULTS RENDERER
    ============================================================ */
 
-const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library';
-const PHRASING_URL = 'https://www.bobbyjarvisjr.com/products/pentatonic-phrasing-challenge-complete-4-week-series';
+const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library-pack';
 
 function esc(s){
   return String(s == null ? '' : s)
@@ -1230,17 +1236,13 @@ function renderProduct(n, name, spec, body, url, cta, ghost, chips){
 
 function renderCourse(data){
   const named = data.sections_named || [];
-  const one = named.length === 1;
   const courseUrl = data.course_url || COURSE_URL;
-  const phrasingUrl = data.phrasing_url || PHRASING_URL;
   const guide = data.free_guide;
 
   const chips = named.length ? `
     <div class="r-prod-sections">
       ${named.map(s => `<span class="r-prod-chip">${esc(s)}</span>`).join('')}
     </div>` : '';
-
-  let n = 0;
 
   return `
     <div class="r-final">
@@ -1255,19 +1257,22 @@ function renderCourse(data){
              &mdash; and it's the part I've already filmed.</p>
         </div>
 
-        ${guide ? renderProduct(++n, guide.title, guide.spec, esc(guide.body),
-            guide.url, 'Download the guide', true) : ''}
+        <div class="r-prod r-prod--solo">
+          <div class="r-prod-body">
+            <div class="r-prod-name">The Complete Course Library</div>
+            <div class="r-prod-spec">21 masterclasses &middot; 40+ hours &middot; Pentatonic Phrasing included</div>
+            <p>Neck navigation through to modes, triads, extended chords and full song
+               studies &mdash; plus the application side: phrasing, space, and building
+               a solo that goes somewhere. Every section named above lives in here.</p>
+            ${chips}
+            <a class="r-cta" href="${courseUrl}">Get the Complete Library &rarr;</a>
+          </div>
+        </div>
 
-        ${renderProduct(++n, 'The Complete Course Library', '16 masterclasses &middot; 30 hours',
-            `Neck navigation through to modes, triads, extended chords and full song
-             studies. ${named.length ? `The ${one ? 'section' : 'sections'} above ${one ? 'lives' : 'live'} in here &mdash; you get the whole library, not just ${one ? 'that one' : 'those two'}.` : ''}`,
-            courseUrl, 'Get the Complete Library', false, chips)}
-
-        ${data.phrasing ? renderProduct(++n, 'Pentatonic Phrasing', 'The application course',
-            `The Library gives you the material. This one is what you do with it
-             &mdash; phrasing, space, and building a solo that goes somewhere instead
-             of running shapes.`,
-            phrasingUrl, 'Get Pentatonic Phrasing', true) : ''}
+        ${guide ? `
+        <p class="r-freebie">Oh &mdash; and take this with you:
+          <a href="${guide.url}">${esc(guide.title)}</a>
+          <span>(${esc(guide.spec)})</span>. The whole picture in one read.</p>` : ''}
 
         <div class="r-close-foot">
           <p class="r-course-hard">You'd spend double this on a pedal you'll be bored of
