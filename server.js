@@ -18,30 +18,121 @@ const anthropic = new Anthropic({
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library';
+const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library-pack';
 const PHRASING_URL = 'https://www.bobbyjarvisjr.com/products/pentatonic-phrasing-challenge-complete-4-week-series';
 const FROM_EMAIL = 'jarvis@bobbyjarvisjr.com';
-const RESEND_AUDIENCE_ID = '75f227cf-4d8c-429a-8fcf-ee71f69c70fd';
+// Shopify customer creation — pick ONE route via env vars in Vercel:
+//   Route A (Zapier):     set ZAPIER_HOOK_URL to a "Catch Hook" URL; the zap's
+//                         action is Shopify → Create Customer.
+//   Route B (new apps):   set SHOPIFY_STORE_DOMAIN (*.myshopify.com) plus
+//                         SHOPIFY_CLIENT_ID and SHOPIFY_CLIENT_SECRET from a
+//                         Dev Dashboard custom app (post-Jan-2026 flow).
+//   Route C (legacy):     set SHOPIFY_STORE_DOMAIN and SHOPIFY_ADMIN_TOKEN
+//                         (shpat_...) from a pre-2026 admin custom app.
+// If more than one is set: Zapier > legacy token > client credentials.
+const ZAPIER_HOOK_URL = process.env.ZAPIER_HOOK_URL;
+const SHOPIFY_STORE = process.env.SHOPIFY_STORE_DOMAIN;
+const SHOPIFY_TOKEN = process.env.SHOPIFY_ADMIN_TOKEN;
+const SHOPIFY_CLIENT_ID = process.env.SHOPIFY_CLIENT_ID;
+const SHOPIFY_CLIENT_SECRET = process.env.SHOPIFY_CLIENT_SECRET;
+
+// New-flow apps issue short-lived tokens via the client credentials grant.
+// Cache the token and refresh a minute before it expires.
+let shopifyTokenCache = { token: null, expiresAt: 0 };
+
+async function getShopifyToken() {
+  if (SHOPIFY_TOKEN) return SHOPIFY_TOKEN; // legacy permanent token
+  if (shopifyTokenCache.token && Date.now() < shopifyTokenCache.expiresAt - 60000) {
+    return shopifyTokenCache.token;
+  }
+  const res = await fetch('https://' + SHOPIFY_STORE + '/admin/oauth/access_token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id: SHOPIFY_CLIENT_ID,
+      client_secret: SHOPIFY_CLIENT_SECRET,
+      grant_type: 'client_credentials'
+    })
+  });
+  if (!res.ok) throw new Error('Shopify token exchange failed: ' + res.status);
+  const data = await res.json();
+  shopifyTokenCache = {
+    token: data.access_token,
+    expiresAt: Date.now() + (data.expires_in || 86400) * 1000
+  };
+  return data.access_token;
+}
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-/* ============ LEAD CAPTURE ============ */
+// Creates the lead as a Shopify customer, tagged for segmentation.
+// Never throws — a Shopify hiccup must not block the plan or the email.
+async function saveShopifyCustomer(name, email) {
+  const firstName = name.split(' ')[0];
+  const lastName = name.split(' ').slice(1).join(' ') || '';
 
-async function saveLead(name, email) {
+  // Route A — hand off to Zapier; the zap creates the Shopify customer.
+  if (ZAPIER_HOOK_URL) {
+    try {
+      const res = await fetch(ZAPIER_HOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          tags: 'practice-pathway',
+          source: 'practice-pathway'
+        })
+      });
+      if (!res.ok) console.error('Zapier hook failed:', res.status);
+    } catch (err) {
+      console.error('Zapier hook error:', err.message);
+    }
+    return;
+  }
+
+  // Route B/C — direct to the Shopify Admin API.
+  if (!SHOPIFY_STORE || (!SHOPIFY_TOKEN && !(SHOPIFY_CLIENT_ID && SHOPIFY_CLIENT_SECRET))) {
+    console.warn('No lead-capture route configured — skipping customer create');
+    return;
+  }
   try {
-    const firstName = name.split(' ')[0];
-    const lastName = name.split(' ').slice(1).join(' ') || '';
-    await resend.contacts.create({
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      unsubscribed: false,
-      audienceId: RESEND_AUDIENCE_ID,
+    const token = await getShopifyToken();
+    const res = await fetch('https://' + SHOPIFY_STORE + '/admin/api/2025-07/customers.json', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Access-Token': token
+      },
+      body: JSON.stringify({
+        customer: {
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          tags: 'practice-pathway',
+          email_marketing_consent: {
+            state: 'subscribed',
+            opt_in_level: 'single_opt_in',
+            consent_updated_at: new Date().toISOString()
+          }
+        }
+      })
     });
+    if (res.status === 422) {
+      // Almost always "email has already been taken" — they're already a
+      // customer, which is fine. Log and move on.
+      const body = await res.json().catch(function () { return {}; });
+      console.log('Shopify 422 (probably existing customer):', JSON.stringify(body.errors || {}));
+      return;
+    }
+    if (!res.ok) {
+      console.error('Shopify customer create failed:', res.status, await res.text());
+    }
   } catch (err) {
-    console.error('Failed to save contact to Resend:', err.message);
+    console.error('Shopify customer create error:', err.message);
   }
 }
 
@@ -629,7 +720,7 @@ app.post('/api/generate-plan', async function (req, res) {
     plan.phrasing_url = PHRASING_URL;
 
     await Promise.all([
-      saveLead(name, email),
+      saveShopifyCustomer(name, email),
       resend.emails.send({
         from: FROM_EMAIL,
         to: email,
