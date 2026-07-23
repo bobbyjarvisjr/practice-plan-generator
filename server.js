@@ -54,7 +54,10 @@ async function getShopifyToken() {
       grant_type: 'client_credentials'
     })
   });
-  if (!res.ok) throw new Error('Shopify token exchange failed: ' + res.status);
+  if (!res.ok) {
+    const body = await res.text().catch(function () { return ''; });
+    throw new Error('Shopify token exchange failed: ' + res.status + ' ' + body);
+  }
   const data = await res.json();
   shopifyTokenCache = {
     token: data.access_token,
@@ -69,6 +72,39 @@ app.use(express.static('public'));
 
 // Creates the lead as a Shopify customer, tagged for segmentation.
 // Never throws — a Shopify hiccup must not block the plan or the email.
+// An existing customer ran the planner. Find them and append the tag so
+// they land in the same segment as new leads. Tags only — never touch
+// marketing consent on an existing record (they may have unsubscribed).
+async function tagExistingCustomer(email, token) {
+  try {
+    const q = await fetch(
+      'https://' + SHOPIFY_STORE + '/admin/api/2025-07/customers/search.json?query=' +
+      encodeURIComponent('email:' + email),
+      { headers: { 'X-Shopify-Access-Token': token } }
+    );
+    if (!q.ok) { console.error('Customer search failed:', q.status); return; }
+    const data = await q.json();
+    const cust = (data.customers || []).find(function (c) {
+      return (c.email || '').toLowerCase() === email.toLowerCase();
+    });
+    if (!cust) { console.log('422 on create but no exact match found for', email); return; }
+
+    const tags = (cust.tags || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean);
+    if (tags.indexOf('practice-pathway') !== -1) return; // already tagged
+    tags.push('practice-pathway');
+
+    const put = await fetch('https://' + SHOPIFY_STORE + '/admin/api/2025-07/customers/' + cust.id + '.json', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token },
+      body: JSON.stringify({ customer: { id: cust.id, tags: tags.join(', ') } })
+    });
+    if (!put.ok) console.error('Tag update failed:', put.status);
+    else console.log('Tagged existing customer', cust.id);
+  } catch (err) {
+    console.error('Tag existing customer error:', err.message);
+  }
+}
+
 async function saveShopifyCustomer(name, email) {
   const firstName = name.split(' ')[0];
   const lastName = name.split(' ').slice(1).join(' ') || '';
@@ -122,10 +158,11 @@ async function saveShopifyCustomer(name, email) {
       })
     });
     if (res.status === 422) {
-      // Almost always "email has already been taken" — they're already a
-      // customer, which is fine. Log and move on.
+      // Almost always "email has already been taken" — an existing customer
+      // ran the planner. Tag them so they join the planner segment.
       const body = await res.json().catch(function () { return {}; });
-      console.log('Shopify 422 (probably existing customer):', JSON.stringify(body.errors || {}));
+      console.log('Shopify 422 (existing customer) — tagging instead:', JSON.stringify(body.errors || {}));
+      await tagExistingCustomer(email, token);
       return;
     }
     if (!res.ok) {
