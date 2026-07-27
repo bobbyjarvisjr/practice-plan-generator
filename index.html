@@ -746,9 +746,9 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
 
       <!-- CAPTURE -->
       <section class="screen" id="screen-capture">
-        <div class="q-section">Last bit</div>
+        <div class="q-section">Quick one</div>
         <div class="q-text">Where do I send it?</div>
-        <p class="q-hint">Shows up on screen straight away. I'll email a copy too, so you've still got it next week.</p>
+        <p class="q-hint">Answer the rest and your pathway shows up on screen at the end. I'll email you a copy too, so you've still got it next week.</p>
         <div class="fields">
           <div class="field">
             <label for="userName">First name</label>
@@ -759,7 +759,7 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
             <input type="email" id="userEmail" placeholder="you@email.com" autocomplete="email">
           </div>
         </div>
-        <button class="btn" id="submitBtn">Show me my pathway →</button>
+        <button class="btn" id="captureBtn">Continue →</button>
         <p class="consent">You'll get the odd email from me. Guitar stuff, new lessons, nothing daft. Unsubscribe whenever.</p>
       </section>
 
@@ -879,6 +879,8 @@ const scores = {};
 const struggles = new Set();
 const goals = new Set();
 let freeText = '';
+let leadName = '', leadEmail = '', leadCaptured = false;
+let resumeIdx = 1;
 let queue = [];        // flattened list of screen descriptors
 let idx = -1;          // -1 = intro
 const container = document.getElementById('questions');
@@ -936,7 +938,7 @@ function buildScreen(item){
       <div class="sub-q">Anything else? <em>Optional</em></div>
       <textarea id="freeText" class="free-text" rows="3" placeholder="The thing you've been stuck on, what you've already tried, how long you've been at it. Whatever's useful."></textarea>
 
-      <div style="margin-top:32px"><button class="btn" data-next>Nearly there →</button></div>`;
+      <div style="margin-top:32px"><button class="btn" data-next>Build my pathway →</button></div>`;
 
     el.querySelectorAll('.chk').forEach(chk => {
       const isGoal = chk.classList.contains('goal');
@@ -953,7 +955,7 @@ function buildScreen(item){
         if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); toggle(); }
       });
     });
-    el.querySelector('[data-next]').addEventListener('click', goCapture);
+    el.querySelector('[data-next]').addEventListener('click', submitPlan);
     return el;
   }
 
@@ -1054,19 +1056,22 @@ function pick(name, value){
   const nextIdx = current + 1;
   markChosen(queue[current]);
   setTimeout(() => {
+    // Email gate fires once, after the first answer. If the email is already
+    // held (even if the capture call failed), never gate again.
+    if (!leadEmail && Object.keys(scores).length === 1){
+      resumeIdx = nextIdx;
+      showCaptureGate();
+      return;
+    }
     if (nextIdx < queue.length) show(nextIdx);
-    else goCapture();
   }, 180);
 }
 
-function goCapture(){
+function showCaptureGate(){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-capture').classList.add('active');
-  progEl.style.width = '100%';
-  counterEl.textContent = '';
   navbar.classList.add('hidden');
   window.scrollTo({ top:0, behavior:'instant' });
-  idx = queue.length; // past the end
 }
 
 document.getElementById('begin').addEventListener('click', () => {
@@ -1108,21 +1113,41 @@ const LOAD_MESSAGES = [
   'Building your pathway'
 ];
 
-document.getElementById('submitBtn').addEventListener('click', async () => {
-  const ft = document.getElementById('freeText');
-  if (ft) freeText = ft.value.trim();
+document.getElementById('captureBtn').addEventListener('click', () => {
   const name = document.getElementById('userName').value.trim();
   const email = document.getElementById('userEmail').value.trim();
   errEl.classList.remove('on');
 
-  if (!name || !email){
+  if (!name || !email || email.indexOf('@') === -1){
     errEl.textContent = 'I need a name and an email to send this to.';
     errEl.classList.add('on');
     return;
   }
 
+  leadName = name;
+  leadEmail = email;
+
+  // Fire the lead capture NOW — if they bail before finishing, the lead is
+  // already in Shopify. Fire-and-forget: the questionnaire never waits on it.
+  fetch(`${API_BASE}/api/capture-lead`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ name, email })
+  }).then(r => { if (r.ok) leadCaptured = true; }).catch(() => {});
+
+  document.getElementById('screen-capture').classList.remove('active');
+  navbar.classList.remove('hidden');
+  show(resumeIdx);
+});
+
+async function submitPlan(){
+  const ft = document.getElementById('freeText');
+  if (ft) freeText = ft.value.trim();
+  errEl.classList.remove('on');
+
   const payload = {
-    name, email,
+    name: leadName, email: leadEmail,
+    lead_captured: leadCaptured,
     scales:{}, triads:{}, chords:{}, arpeggios:{}, navigation:{}, technique:{},
     struggles:[...struggles],
     goals:[...goals],
@@ -1138,7 +1163,10 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     else payload.technique[k] = v;
   });
 
-  document.getElementById('screen-capture').classList.remove('active');
+  document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active'));
+  navbar.classList.add('hidden');
+  progEl.style.width = '100%';
+  counterEl.textContent = '';
   loadingEl.classList.add('on');
   let m = 0;
   const cycle = setInterval(() => {
@@ -1156,7 +1184,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     const data = await res.json();
     clearInterval(cycle);
     loadingEl.classList.remove('on');
-    resultsEl.innerHTML = renderPathway(data, name);
+    resultsEl.innerHTML = renderPathway(data, leadName);
     resultsEl.classList.add('on');
     initReveals();
     window.scrollTo({ top:0, behavior:'instant' });
@@ -1165,9 +1193,10 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     loadingEl.classList.remove('on');
     errEl.textContent = 'That didn\'t go through: ' + err.message + '. Have another go.';
     errEl.classList.add('on');
-    document.getElementById('screen-capture').classList.add('active');
+    document.getElementById('sc-struggles').classList.add('active');
+    navbar.classList.remove('hidden');
   }
-});
+}
 
 /* ============================================================
    RESULTS RENDERER
