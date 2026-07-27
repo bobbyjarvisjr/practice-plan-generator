@@ -702,6 +702,24 @@ close +
 
 /* ============ ROUTE ============ */
 
+// Fires the moment the email gate is passed, mid-questionnaire. The lead is
+// captured even if they never finish. Awaited before responding so the
+// serverless invocation can't be frozen mid-save.
+app.post('/api/capture-lead', async function (req, res) {
+  try {
+    const name = (req.body.name || '').trim();
+    const email = (req.body.email || '').trim();
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required' });
+    }
+    await saveShopifyCustomer(name, email);
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('capture-lead error:', error);
+    res.status(500).json({ error: 'Capture failed' });
+  }
+});
+
 app.post('/api/generate-plan', async function (req, res) {
   try {
     const body = req.body;
@@ -747,7 +765,9 @@ app.post('/api/generate-plan', async function (req, res) {
     plan.course_url = COURSE_URL;
 
     await Promise.all([
-      saveShopifyCustomer(name, email),
+      // Lead already landed in Shopify at the mid-flow gate; only save here
+      // if that call never succeeded (belt and braces).
+      req.body.lead_captured ? Promise.resolve() : saveShopifyCustomer(name, email),
       resend.emails.send({
         from: FROM_EMAIL,
         to: email,
