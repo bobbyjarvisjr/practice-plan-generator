@@ -20,6 +20,13 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const COURSE_URL = 'https://www.bobbyjarvisjr.com/products/complete-course-library-pack';
 const FROM_EMAIL = 'jarvis@bobbyjarvisjr.com';
+
+// Tags a lead can be filed under in Shopify. The homepage guide capture and
+// the planner use different tags so segments (and any welcome automations)
+// can be split. Anything not in this list falls back to the planner tag.
+const ALLOWED_TAGS = ['practice-pathway', 'stuck-guide'];
+const DEFAULT_TAG = 'practice-pathway';
+
 // Shopify customer creation — pick ONE route via env vars in Vercel:
 //   Route A (Zapier):     set ZAPIER_HOOK_URL to a "Catch Hook" URL; the zap's
 //                         action is Shopify → Create Customer.
@@ -71,10 +78,11 @@ app.use(express.static('public'));
 
 // Creates the lead as a Shopify customer, tagged for segmentation.
 // Never throws — a Shopify hiccup must not block the plan or the email.
-// An existing customer ran the planner. Find them and append the tag so
-// they land in the same segment as new leads. Tags only — never touch
-// marketing consent on an existing record (they may have unsubscribed).
-async function tagExistingCustomer(email, token) {
+// An existing customer ran the planner (or grabbed the guide). Find them and
+// append the tag so they land in the same segment as new leads. Tags only —
+// never touch marketing consent on an existing record (they may have
+// unsubscribed).
+async function tagExistingCustomer(email, token, tag) {
   try {
     const q = await fetch(
       'https://' + SHOPIFY_STORE + '/admin/api/2025-07/customers/search.json?query=' +
@@ -89,8 +97,8 @@ async function tagExistingCustomer(email, token) {
     if (!cust) { console.log('422 on create but no exact match found for', email); return; }
 
     const tags = (cust.tags || '').split(',').map(function (t) { return t.trim(); }).filter(Boolean);
-    if (tags.indexOf('practice-pathway') !== -1) return; // already tagged
-    tags.push('practice-pathway');
+    if (tags.indexOf(tag) !== -1) return; // already tagged
+    tags.push(tag);
 
     const put = await fetch('https://' + SHOPIFY_STORE + '/admin/api/2025-07/customers/' + cust.id + '.json', {
       method: 'PUT',
@@ -98,13 +106,14 @@ async function tagExistingCustomer(email, token) {
       body: JSON.stringify({ customer: { id: cust.id, tags: tags.join(', ') } })
     });
     if (!put.ok) console.error('Tag update failed:', put.status);
-    else console.log('Tagged existing customer', cust.id);
+    else console.log('Tagged existing customer', cust.id, 'with', tag);
   } catch (err) {
     console.error('Tag existing customer error:', err.message);
   }
 }
 
-async function saveShopifyCustomer(name, email) {
+async function saveShopifyCustomer(name, email, tag) {
+  tag = ALLOWED_TAGS.indexOf(tag) !== -1 ? tag : DEFAULT_TAG;
   const firstName = name.split(' ')[0];
   const lastName = name.split(' ').slice(1).join(' ') || '';
 
@@ -118,8 +127,8 @@ async function saveShopifyCustomer(name, email) {
           first_name: firstName,
           last_name: lastName,
           email: email,
-          tags: 'practice-pathway',
-          source: 'practice-pathway'
+          tags: tag,
+          source: tag
         })
       });
       if (!res.ok) console.error('Zapier hook failed:', res.status);
@@ -147,7 +156,7 @@ async function saveShopifyCustomer(name, email) {
           first_name: firstName,
           last_name: lastName,
           email: email,
-          tags: 'practice-pathway',
+          tags: tag,
           email_marketing_consent: {
             state: 'subscribed',
             opt_in_level: 'single_opt_in',
@@ -158,10 +167,10 @@ async function saveShopifyCustomer(name, email) {
     });
     if (res.status === 422) {
       // Almost always "email has already been taken" — an existing customer
-      // ran the planner. Tag them so they join the planner segment.
+      // came back through a capture flow. Tag them so they join the segment.
       const body = await res.json().catch(function () { return {}; });
       console.log('Shopify 422 (existing customer) — tagging instead:', JSON.stringify(body.errors || {}));
-      await tagExistingCustomer(email, token);
+      await tagExistingCustomer(email, token, tag);
       return;
     }
     if (!res.ok) {
@@ -299,7 +308,6 @@ function buildRecommendation(flatScores) {
     good_stuff: RECOMMENDATIONS[good],
     theory: RECOMMENDATIONS[theory],
     phrasing: PHRASING[phrasing],
-    // Sections named from the Complete Library, in course order, for the close.
     // Sections named from the Complete Library, in course order, plus the
     // phrasing section (now folded into the Library), for the close.
     sections_named: COURSE_SECTIONS.filter(function (sec) {
@@ -700,19 +708,22 @@ close +
   );
 }
 
-/* ============ ROUTE ============ */
+/* ============ ROUTES ============ */
 
-// Fires the moment the email gate is passed, mid-questionnaire. The lead is
-// captured even if they never finish. Awaited before responding so the
-// serverless invocation can't be frozen mid-save.
+// Fires the moment an email is captured — from the guide form on the
+// homepage (tag: stuck-guide) or the planner's capture screen (tag:
+// practice-pathway). The lead is captured even if they never finish.
+// Awaited before responding so the serverless invocation can't be frozen
+// mid-save.
 app.post('/api/capture-lead', async function (req, res) {
   try {
     const name = (req.body.name || '').trim();
     const email = (req.body.email || '').trim();
+    const tag = (req.body.tag || '').trim();
     if (!name || !email) {
       return res.status(400).json({ error: 'Name and email are required' });
     }
-    await saveShopifyCustomer(name, email);
+    await saveShopifyCustomer(name, email, tag);
     res.json({ ok: true });
   } catch (error) {
     console.error('capture-lead error:', error);
@@ -765,9 +776,9 @@ app.post('/api/generate-plan', async function (req, res) {
     plan.course_url = COURSE_URL;
 
     await Promise.all([
-      // Lead already landed in Shopify at the mid-flow gate; only save here
+      // Lead already landed in Shopify at the capture screen; only save here
       // if that call never succeeded (belt and braces).
-      req.body.lead_captured ? Promise.resolve() : saveShopifyCustomer(name, email),
+      req.body.lead_captured ? Promise.resolve() : saveShopifyCustomer(name, email, 'practice-pathway'),
       resend.emails.send({
         from: FROM_EMAIL,
         to: email,
