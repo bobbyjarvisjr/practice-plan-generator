@@ -553,123 +553,22 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
 .r-rep-mc b{color:var(--ink-dim);font-weight:500;text-transform:uppercase;letter-spacing:.13em}
 
 /* ============================================================
-   THE CLOSE — final node on the same spine
+   THE CLOSE — a quiet P.S., not a pitch
    ============================================================ */
-.r-final{
-  position:relative;
-  margin-top:8px;
-  padding-left:78px;
+.r-ps{
+  margin-top:8px;padding-top:34px;
+  border-top:1px solid var(--line);
 }
-.r-final::before{
-  content:'';position:absolute;
-  left:23px;top:-90px;height:114px;width:2px;
-  background:linear-gradient(to bottom,var(--accent),var(--ink));
-}
-.r-final-node{
-  position:absolute;left:0;top:0;
-  width:48px;height:48px;border-radius:50%;
-  background:var(--ink);color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--display);font-size:24px;line-height:1;letter-spacing:.03em;
-  box-shadow:0 0 0 7px var(--bg), 0 6px 18px -6px rgba(0,0,0,.4);
-}
-.r-close{
-  position:relative;
-  background:var(--ink);border-radius:4px;
-  border-top:3px solid var(--accent);
-  padding:46px 42px 40px;
-  overflow:hidden;
-}
-.r-close::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 70% 100% at 100% 0%, rgba(255,90,60,.16), transparent 60%);
-}
-.r-close > *{position:relative}
-
-.r-course-kicker{
-  font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+.r-ps-label{
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--accent);margin-bottom:14px;
 }
-.r-course-head{
-  font-family:var(--display);
-  font-size:clamp(32px,5vw,48px);
-  line-height:.98;letter-spacing:.012em;text-transform:uppercase;
-  color:#fff;margin-bottom:24px;max-width:17ch;
-  text-wrap:balance;
+.r-ps p{
+  font-size:17px;line-height:1.68;color:var(--ink-dim);font-weight:300;
+  max-width:56ch;margin:0;
 }
-.r-close-head p{
-  font-size:17px;line-height:1.68;color:#cfc8c1;font-weight:300;
-  max-width:54ch;margin:0;
-}
-.r-close-head p em{color:var(--accent);font-style:normal;font-weight:400}
-
-/* the products */
-.r-prod{
-  display:grid;grid-template-columns:auto 1fr;gap:0 22px;
-  padding:32px 0;border-top:1px solid rgba(255,255,255,.15);
-  margin-top:34px;
-}
-.r-prod + .r-prod{margin-top:0}
-.r-prod-num{
-  font-family:var(--display);font-size:19px;line-height:1;
-  color:var(--accent);padding-top:6px;letter-spacing:.1em;
-}
-.r-prod-name{
-  font-family:var(--display);font-size:clamp(25px,3.4vw,32px);
-  line-height:1.04;letter-spacing:.014em;text-transform:uppercase;
-  color:#fff;margin-bottom:6px;
-}
-.r-prod-spec{
-  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:18px;
-}
-.r-prod-body p{
-  font-size:16.5px;line-height:1.66;color:#cfc8c1;font-weight:300;
-  max-width:52ch;margin-bottom:20px;
-}
-.r-prod--solo{grid-template-columns:1fr}
-.r-freebie{
-  margin:6px 0 0;padding:20px 0 8px;
-  font-size:15px;line-height:1.65;color:#a89f97;font-weight:300;max-width:52ch;
-}
-.r-freebie a{color:#fff}
-.r-freebie span{color:#8e857c}
-.r-prod-sections{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 22px}
-.r-prod-chip{
-  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  color:#ffcabd;border:1px solid rgba(255,90,60,.45);background:rgba(255,90,60,.08);
-  padding:6px 11px;border-radius:2px;
-}
-
-.r-cta{
-  display:inline-flex;align-items:center;gap:12px;
-  font-family:var(--display);font-size:19px;letter-spacing:.06em;text-transform:uppercase;
-  background:var(--accent);color:#fff;text-decoration:none;
-  padding:16px 30px;border-radius:2px;
-  transition:transform .15s,filter .15s,box-shadow .15s;
-  box-shadow:0 10px 30px -12px rgba(255,90,60,.7);
-}
-.r-cta:hover{filter:brightness(1.08);transform:translateY(-2px)}
-.r-cta:focus-visible{outline:2px solid #fff;outline-offset:3px}
-.r-cta-ghost{
-  background:transparent;color:#f2ede7;
-  border:1px solid rgba(255,255,255,.38);box-shadow:none;
-}
-.r-cta-ghost:hover{background:rgba(255,255,255,.07);box-shadow:none}
-
-.r-close-foot{
-  margin-top:14px;padding-top:32px;border-top:1px solid rgba(255,255,255,.15);
-}
-.r-course-hard{
-  border-left:2px solid var(--accent);padding-left:20px;
-  color:#e6e0da;font-size:17px;line-height:1.66;font-weight:300;
-  max-width:54ch;margin:0;
-}
-.r-course-foot{
-  margin-top:24px;font-size:14.5px;line-height:1.62;
-  color:#8e857c;font-weight:300;max-width:48ch;
-}
-.r-final-node{font-size:20px!important}
+.r-ps a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-line)}
+.r-ps a:hover{border-bottom-color:var(--accent)}
 
 .r-foot{
   margin-top:40px;padding-top:24px;border-top:1px solid var(--line);
@@ -685,16 +584,12 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
 }
 @media (max-width:760px){
   .results.on{margin-left:0;margin-right:0}
-  .r-path,.r-final{padding-left:56px}
+  .r-path{padding-left:56px}
   .r-path::before{left:17px}
-  .r-final::before{left:17px}
-  .r-step-node,.r-final-node{width:36px;height:36px;font-size:19px;box-shadow:0 0 0 6px var(--bg)}
+  .r-step-node{width:36px;height:36px;font-size:19px;box-shadow:0 0 0 6px var(--bg)}
   .r-step-node{left:-56px}
   .r-weak-row{grid-template-columns:1fr;gap:10px 0}
   .r-mis{padding:34px 26px 30px}
-  .r-close{padding:34px 24px 32px}
-  .r-prod{grid-template-columns:1fr;gap:0}
-  .r-prod-num{display:none}
   .r-rep-row{grid-template-columns:1fr;gap:0}
   .r-rep-idx{display:none}
 }
@@ -1297,68 +1192,16 @@ function renderSlot(rec, n, title){
     </div>`;
 }
 
-function renderProduct(n, name, spec, body, url, cta, ghost, chips){
-  return `
-    <div class="r-prod">
-      <div class="r-prod-num">${pad(n)}</div>
-      <div class="r-prod-body">
-        <div class="r-prod-name">${esc(name)}</div>
-        <div class="r-prod-spec">${esc(spec)}</div>
-        <p>${body}</p>
-        ${chips || ''}
-        <a class="r-cta${ghost ? ' r-cta-ghost' : ''}" href="${url}">${esc(cta)} &rarr;</a>
-      </div>
-    </div>`;
-}
-
-function renderCourse(data){
-  const named = data.sections_named || [];
+/* The close is now a single quiet P.S. with a bare link — no pitch block,
+   no product cell, no guide. The course is sold later in the email sequence;
+   here it's just a signpost so the "...where?" question has an answer. */
+function renderClose(data){
   const courseUrl = data.course_url || COURSE_URL;
-  const guide = data.free_guide;
-
-  const chips = named.length ? `
-    <div class="r-prod-sections">
-      ${named.map(s => `<span class="r-prod-chip">${esc(s)}</span>`).join('')}
-    </div>` : '';
-
   return `
-    <div class="r-final">
-      <div class="r-final-node">&rarr;</div>
-      <div class="r-close">
-
-        <div class="r-close-head">
-          <div class="r-course-kicker">Where all this is taught</div>
-          <div class="r-course-head">Now go and actually do it</div>
-          <p>Everything above tells you <em>what</em>. It doesn't tell you <em>how</em>.
-             That's the part that takes hours at the guitar with someone showing you
-             &mdash; and it's the part I've already filmed.</p>
-        </div>
-
-        <div class="r-prod r-prod--solo">
-          <div class="r-prod-body">
-            <div class="r-prod-name">The Complete Course Library</div>
-            <div class="r-prod-spec">21 masterclasses &middot; 40+ hours &middot; Pentatonic Phrasing included</div>
-            <p>Neck navigation through to modes, triads, extended chords and full song
-               studies &mdash; plus the application side: phrasing, space, and building
-               a solo that goes somewhere. Every section named above lives in here.</p>
-            ${chips}
-            <a class="r-cta" href="${courseUrl}">Get the Complete Library &rarr;</a>
-          </div>
-        </div>
-
-        ${guide ? `
-        <p class="r-freebie">Oh &mdash; and take this with you:
-          <a href="${guide.url}">${esc(guide.title)}</a>
-          <span>(${esc(guide.spec)})</span>. The whole picture in one read.</p>` : ''}
-
-        <div class="r-close-foot">
-          <p class="r-course-hard">You'd spend double this on a pedal you'll be bored of
-             in a fortnight. This lasts years.</p>
-          <div class="r-course-foot">Or don't &mdash; the plan above is yours either way,
-            and it works if you work it.</div>
-        </div>
-
-      </div>
+    <div class="r-ps">
+      <div class="r-ps-label">P.S.</div>
+      <p>All the courses and all the recommended study material I've pointed you at
+         are in my Complete Library course. <a href="${courseUrl}">Here's the link.</a></p>
     </div>`;
 }
 
@@ -1410,7 +1253,7 @@ function renderPathway(data, name){
       </div>
     </div>
 
-    ${renderCourse(data)}
+    ${renderClose(data)}
 
     <div class="r-foot">A copy of this is in your inbox. If it's not there in a few minutes, check your spam folder.</div>`;
 }
@@ -1424,7 +1267,7 @@ function initReveals(){
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!('IntersectionObserver' in window)) return;
 
-  const blocks = resultsEl.querySelectorAll('.r-block, .r-mis, .r-final, .r-foot');
+  const blocks = resultsEl.querySelectorAll('.r-block, .r-mis, .r-ps, .r-foot');
   blocks.forEach(b => b.classList.add('js-reveal'));
 
   const path = resultsEl.querySelector('.r-path');
