@@ -748,7 +748,7 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
       <section class="screen" id="screen-capture">
         <div class="q-section">Quick one</div>
         <div class="q-text">Where do I send it?</div>
-        <p class="q-hint">Answer the rest and your pathway shows up on screen at the end. I'll email you a copy too, so you've still got it next week.</p>
+        <p class="q-hint">Your pathway shows up on screen at the end. I'll email you a copy too, so you've still got it next week.</p>
         <div class="fields">
           <div class="field">
             <label for="userName">First name</label>
@@ -783,6 +783,20 @@ body.hero-mode .topbar .mark{color:var(--d-ink)}
 </div>
 
 <script>
+/* ============================================================
+   EMAIL GATE
+   ============================================================
+   false = the planner is a nurture-sequence tool. Nobody gets
+           interrupted mid-questionnaire. The capture screen only
+           appears at the very end (the backend still needs an
+           email to send the plan to), and is skipped entirely if
+           the visitor arrived via a link carrying ?email=...
+   true  = restore the original lead-magnet behaviour: gate fires
+           after the first answer, before any more questions.
+   One flag. Nothing else to change.
+   ============================================================ */
+const EMAIL_GATE = false;
+
 /* ============ CONTENT ============ */
 const ANCHORS = [
   "No knowledge at all",
@@ -881,12 +895,27 @@ const goals = new Set();
 let freeText = '';
 let leadName = '', leadEmail = '', leadCaptured = false;
 let resumeIdx = 1;
+let pendingSubmit = false; // gate-off mode: capture shown at the end, then submit
 let queue = [];        // flattened list of screen descriptors
 let idx = -1;          // -1 = intro
 const container = document.getElementById('questions');
 const progEl = document.getElementById('prog');
 const counterEl = document.getElementById('counter');
 const navbar = document.getElementById('navbar');
+
+/* Nurture-sequence prefill: a link like /?name=Bobby&email=x@y.com skips the
+   capture screen entirely — they already gave their email to get here. */
+(function(){
+  try {
+    const p = new URLSearchParams(window.location.search);
+    const e = (p.get('email') || '').trim();
+    const n = (p.get('name') || '').trim();
+    if (e && e.indexOf('@') !== -1){
+      leadEmail = e;
+      leadName = n || e.split('@')[0];
+    }
+  } catch (err) { /* old browser, no params — capture screen handles it */ }
+})();
 
 /* Build the queue from whatever is currently unlocked. */
 function rebuildQueue(){
@@ -1056,18 +1085,20 @@ function pick(name, value){
   const nextIdx = current + 1;
   markChosen(queue[current]);
   setTimeout(() => {
-    // Email gate fires once, after the first answer. If the email is already
-    // held (even if the capture call failed), never gate again.
-    if (!leadEmail && Object.keys(scores).length === 1){
+    // Mid-flow email gate — only when EMAIL_GATE is true (lead-magnet mode).
+    // Fires once, after the first answer. If the email is already held (even
+    // if the capture call failed), never gate again.
+    if (EMAIL_GATE && !leadEmail && Object.keys(scores).length === 1){
       resumeIdx = nextIdx;
-      showCaptureGate();
+      showCaptureGate('Continue →');
       return;
     }
     if (nextIdx < queue.length) show(nextIdx);
   }, 180);
 }
 
-function showCaptureGate(){
+function showCaptureGate(btnText){
+  document.getElementById('captureBtn').textContent = btnText || 'Continue →';
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-capture').classList.add('active');
   navbar.classList.add('hidden');
@@ -1132,10 +1163,18 @@ document.getElementById('captureBtn').addEventListener('click', () => {
   fetch(`${API_BASE}/api/capture-lead`, {
     method:'POST',
     headers:{ 'Content-Type':'application/json' },
-    body: JSON.stringify({ name, email })
+    body: JSON.stringify({ name, email, tag:'practice-pathway' })
   }).then(r => { if (r.ok) leadCaptured = true; }).catch(() => {});
 
   document.getElementById('screen-capture').classList.remove('active');
+
+  // Gate-off mode: capture was the last stop before the plan — build it now.
+  if (pendingSubmit){
+    pendingSubmit = false;
+    submitPlan();
+    return;
+  }
+
   navbar.classList.remove('hidden');
   show(resumeIdx);
 });
@@ -1144,6 +1183,15 @@ async function submitPlan(){
   const ft = document.getElementById('freeText');
   if (ft) freeText = ft.value.trim();
   errEl.classList.remove('on');
+
+  // Gate-off mode: no email yet means the capture screen hasn't been seen.
+  // Show it once, right before the plan is built (the backend needs an email
+  // to send the copy to). Prefilled URL visitors sail straight past this.
+  if (!leadEmail){
+    pendingSubmit = true;
+    showCaptureGate('Build my pathway →');
+    return;
+  }
 
   const payload = {
     name: leadName, email: leadEmail,
