@@ -269,13 +269,6 @@ const PHRASING = {
   }
 };
 
-const FREE_GUIDE = {
-  title: "The Stuck Guitarist's No Bullshit Guide",
-  spec: 'Free · 29 pages',
-  url: "https://bobbyjarvisjrpullzone.b-cdn.net/The%20Stuck%20Guitarist's%20No%20Bullshit%20Guide.pdf",
-  body: "A 29-page handout covering the whole picture — the five pentatonic positions, the navigation system, CAGED, triads, 7th chords, modes, and how to actually practise it. Read this first. It'll show you the shape of the thing before you spend anything."
-};
-
 // Slot 1 — deepest unlocked in the mechanics chain. Thresholds match the
 // questionnaire gates exactly, so what they were asked and what they're
 // recommended can never disagree.
@@ -304,7 +297,6 @@ function buildRecommendation(flatScores) {
 
   return {
     slot_titles: SLOT_TITLES,
-    free_guide: FREE_GUIDE,
     good_stuff: RECOMMENDATIONS[good],
     theory: RECOMMENDATIONS[theory],
     phrasing: PHRASING[phrasing],
@@ -616,50 +608,16 @@ function buildEmailHTML(name, plan) {
     );
   }
 
-  /* close — product block: num, name, spec, blurb, button */
-  function emailProduct(num, title, spec, blurb, url, cta, ghost, extra) {
-    var btn = ghost
-      ? '<td style="border:1px solid rgba(255,255,255,0.45);">' +
-        '<a href="' + url + '" style="display:inline-block;padding:13px 26px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:1px;font-size:14px;color:#ffffff;text-decoration:none;">' + escHtml(cta) + ' &rarr;</a></td>'
-      : '<td style="background:' + accent + ';">' +
-        '<a href="' + url + '" style="display:inline-block;padding:15px 30px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-transform:uppercase;letter-spacing:1px;font-size:15px;color:#ffffff;text-decoration:none;">' + escHtml(cta) + ' &rarr;</a></td>';
-    return (
-      (num ? '<div style="' + mono + 'font-size:11px;color:' + accent + ';margin:0 0 6px;">' + num + '</div>' : '') +
-      '<h3 style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-transform:uppercase;font-size:20px;line-height:1.15;color:#ffffff;margin:0 0 4px;">' + escHtml(title) + '</h3>' +
-      '<div style="' + mono + 'font-size:10px;color:' + accent + ';margin:0 0 12px;">' + spec + '</div>' +
-      '<p style="font-family:Georgia,serif;font-size:15px;line-height:1.6;color:#cfc8c1;margin:0 0 16px;">' + blurb + '</p>' +
-      (extra || '') +
-      '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;"><tr>' + btn + '</tr></table>'
-    );
-  }
-
-  var guide = plan.free_guide;
-  var chips = (plan.sections_named || []).map(function (s) { return escHtml(s); }).join(' &middot; ');
-
+  /* close — a single quiet P.S. with a bare link. No pitch block, no product
+     cell, no guide. The course is sold later in the email sequence; here it's
+     just a signpost so the "...where?" question has an answer. */
+  var courseUrl = plan.course_url || '';
   var close =
-    '<tr><td style="padding:12px 0 0;">' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + ink + ';border-top:3px solid ' + accent + ';">' +
-    '<tr><td style="padding:32px 28px;">' +
-    '<div style="' + mono + 'color:' + accent + ';margin:0 0 10px;">Where all this is taught</div>' +
-    '<h2 style="' + head + 'color:#ffffff;font-size:24px;line-height:1.15;margin:0 0 14px;">Now go and actually do it</h2>' +
-    '<p style="font-family:Georgia,serif;font-size:15px;line-height:1.65;color:#cfc8c1;margin:0 0 22px;">Everything above tells you <span style="color:' + accent + ';">what</span>. It doesn\'t tell you <span style="color:' + accent + ';">how</span>. That\'s the part that takes hours at the guitar with someone showing you &mdash; and it\'s the part I\'ve already filmed.</p>' +
-
-    emailProduct(null, 'The Complete Course Library', '21 masterclasses &middot; 40+ hours &middot; Pentatonic Phrasing included',
-      'Neck navigation through to modes, triads, extended chords and full song studies &mdash; plus the application side: phrasing, space, and building a solo that goes somewhere. Every section named above lives in here.',
-      plan.course_url || '', 'Get the Complete Library', false,
-      chips ? '<div style="' + mono + 'font-size:10px;color:#ffcabd;margin:0 0 16px;">Your sections: ' + chips + '</div>' : '') +
-
-    (guide
-      ? '<p style="font-family:Georgia,serif;font-size:14px;line-height:1.65;color:#a89f97;margin:0 0 24px;">Oh &mdash; and take this with you: <a href="' + guide.url + '" style="color:#ffffff;">' + escHtml(guide.title) + '</a> <span style="color:#8e857c;">(' + escHtml(guide.spec) + ')</span>. The whole picture in one read.</p>'
-      : '') +
-
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' +
-    '<td style="border-top:1px solid #3a3530;padding:20px 0 0;">' +
-    '<p style="font-family:Georgia,serif;font-size:15px;line-height:1.65;color:#e6e0da;border-left:2px solid ' + accent + ';padding-left:16px;margin:0 0 14px;">You\'d spend double this on a pedal you\'ll be bored of in a fortnight. This lasts years.</p>' +
-    '<p style="font-family:Georgia,serif;font-size:13px;line-height:1.6;color:#8e857c;margin:0;">Or don\'t &mdash; the plan above is yours either way, and it works if you work it.</p>' +
-    '</td></tr></table>' +
-
-    '</td></tr></table></td></tr>';
+    '<tr><td style="padding:28px 0 0;border-top:1px solid ' + line + ';">' +
+    '<div style="' + mono + 'color:' + accent + ';margin:0 0 12px;">P.S.</div>' +
+    '<p style="' + body + 'margin:0;">All the courses and all the recommended study material I\'ve pointed you at are in my Complete Library course. ' +
+    '<a href="' + courseUrl + '" style="color:' + accent + ';">Here\'s the link.</a></p>' +
+    '</td></tr>';
 
   return (
 '<!DOCTYPE html>' +
